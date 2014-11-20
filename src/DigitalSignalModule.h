@@ -10,6 +10,17 @@ typedef struct Pipe Pipe;
 typedef struct ModulePin ModulePin;
 typedef struct Outbit Outbit;
 
+struct ModulePin
+{
+    Module *module;
+    int pinNumber;
+};
+
+struct Outbit
+{
+    Module *module;
+};
+
 struct Module
 {
     int (*event)(void *object);
@@ -18,7 +29,7 @@ struct Module
     Inbit clk;
     Inbit input1a;
     Inbit input2a;
-    Inbit outputa;
+    Outbit output;
     int state;
 };
 
@@ -29,17 +40,6 @@ struct Pipe
     void (*configure)(void *nextModuleConnected, void *fromPin, void *toPin);
     ModulePin *modulePin;
     int stateToFire;
-};
-
-struct ModulePin
-{
-    Module *module;
-    int pinNumber;
-};
-
-struct Outbit
-{
-    Module *module;
 };
 
 Module *createdAndModule(Module **module);
