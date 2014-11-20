@@ -42,12 +42,17 @@ struct Pipe
     int stateToFire;
 };
 
-Module *createdAndModule(Module **module);
+Module *createdAndModule(Inbit idata1, Inbit idata2);
 Module *createdOrModule(Module **module);
 Module *createdXorModule(Module **module);
 Module *createdNandModule(Module **module);
 Module *createdNorModule(Module **module);
 Module *createdNotModule(Module **module);
+void destroyModule(Module *module);
+
+int andEvent(Module **module);
+void set(int pin, int state);
+void configureInputOutput(Module *nextModuleConnected, int *fromPin, int *toPin);
 
 void pipeAttach(Pipe **pipe, Module **fromModule, void *fromPin, Module **toModule, void *toPin);
 
