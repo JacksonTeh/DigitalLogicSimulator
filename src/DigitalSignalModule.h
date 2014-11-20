@@ -42,17 +42,27 @@ struct Pipe
     int stateToFire;
 };
 
-Module *createdAndModule(Inbit idata1, Inbit idata2);
-Module *createdOrModule(Module **module);
-Module *createdXorModule(Module **module);
-Module *createdNandModule(Module **module);
-Module *createdNorModule(Module **module);
-Module *createdNotModule(Module **module);
+Module *createdAndModule(Module *module, Inbit idata1, Inbit idata2);
+Module *createdOrModule(Module *module, Inbit idata1, Inbit idata2);
+Module *createdXorModule(Module *module, Inbit idata1, Inbit idata2);
+Module *createdNandModule(Module *module, Inbit idata1, Inbit idata2);
+Module *createdNorModule(Module *module, Inbit idata1, Inbit idata2);
+Module *createdNotModule(Module *module, Inbit idata1, Inbit idata2);
 void destroyModule(Module *module);
 
-int andEvent(Module **module);
-void set(int pin, int state);
-void configureInputOutput(Module *nextModuleConnected, int *fromPin, int *toPin);
+int andEvent(void *module);
+void setAnd(void *pin, void *state);
+int orEvent(void *module);
+void setOr(void *pin, void *state);
+int xorEvent(void *module);
+void setXor(void *pin, void *state);
+int nandEvent(void *module);
+void setNand(void *pin, void *state);
+int norEvent(void *module);
+void setNor(void *pin, void *state);
+int notEvent(void *module);
+void setNot(void *pin, void *state);
+void configureInputOutput(void *nextModuleConnected, void *fromPin, void *toPin);
 
 void pipeAttach(Pipe **pipe, Module **fromModule, void *fromPin, Module **toModule, void *toPin);
 
