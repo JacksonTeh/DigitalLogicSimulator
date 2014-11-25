@@ -1,35 +1,47 @@
 #ifndef DigitalSignalModule_H
 #define DigitalSignalModule_H
 
-typedef enum {LOW, HIGH} State;
+// #define NO_OF_PIN   6
+
+typedef enum {LOW, HIGH, UNKNOWN} State;
+typedef enum {ERR_NO_ERROR, ERR_INVALID_PIN_NUMBER} Error;
 
 typedef int Inbit;
+typedef int Outbit;
 
 typedef struct Module Module;
 typedef struct Pipe Pipe;
-typedef struct ModulePin ModulePin;
-typedef struct Outbit Outbit;
+typedef struct ModuleAndPin ModuleAndPin;
+typedef struct Pin Pin;
+// typedef struct Outbit Outbit;
 
-struct ModulePin
+struct ModuleAndPin
 {
+    //RBT node here to be include
     Module *module;
     int pinNumber;
 };
 
-struct Outbit
+struct Pin
 {
-    Module *module;
+    Module *moduleConnected;    //module that is connected to
+    int pinNumber;              //pin of the module connected to
+    int state;
 };
+
+// struct Outbit
+// {
+    // Module *module;
+// };
 
 struct Module
 {
     int (*event)(void *object);
     void (*set)(void *pin, void *state);
-    void (*configure)(void *nextModuleConnected, void *fromPin, void *toPin);
-    Inbit clk;
-    Inbit input1a;
-    Inbit input2a;
-    Outbit output;
+    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
+    // Inbit clk;
+    Inbit *input;
+    Outbit *output;
     int state;
 };
 
@@ -38,16 +50,16 @@ struct Pipe
     int (*event)(void *object);
     void (*set)(void *pin, void *state);
     void (*configure)(void *nextModuleConnected, void *fromPin, void *toPin);
-    ModulePin *modulePin;
+    ModuleAndPin *moduleAndPin;
     int stateToFire;
 };
 
-Module *createdAndModule(Module *module, Inbit idata1, Inbit idata2);
-Module *createdOrModule(Module *module, Inbit idata1, Inbit idata2);
-Module *createdXorModule(Module *module, Inbit idata1, Inbit idata2);
-Module *createdNandModule(Module *module, Inbit idata1, Inbit idata2);
-Module *createdNorModule(Module *module, Inbit idata1, Inbit idata2);
-Module *createdNotModule(Module *module, Inbit idata1, Inbit idata2);
+Module *createdAndModule(int numberOfPin);
+Module *createdOrModule(int numberOfPin);
+Module *createdXorModule(int numberOfPin);
+Module *createdNandModule(int numberOfPin);
+Module *createdNorModule(int numberOfPin);
+Module *createdNotModule(int numberOfPin);
 void destroyModule(Module *module);
 
 int andEvent(void *module);
@@ -62,8 +74,9 @@ int norEvent(void *module);
 void setNor(void *pin, void *state);
 int notEvent(void *module);
 void setNot(void *pin, void *state);
-void configureInputOutput(void *nextModuleConnected, void *fromPin, void *toPin);
+void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 
 void pipeAttach(Pipe **pipe, Module **fromModule, void *fromPin, Module **toModule, void *toPin);
+void registerEvent(Module *module, unsigned long long expiredPeriod);
 
 #endif // DigitalSignalModule_H

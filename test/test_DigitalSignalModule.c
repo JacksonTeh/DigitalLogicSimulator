@@ -1,6 +1,9 @@
 #include <malloc.h>
+#include <stdio.h>
 #include "unity.h"
 #include "DigitalSignalModule.h"
+#include "CException.h"
+#include "mock_DigitalEventSimulator.h"
 
 void setUp(void)
 {
@@ -10,110 +13,97 @@ void tearDown(void)
 {
 }
 
-void test_createdAndModule_should_create_module_for_AND_gate(void)
+void test_createdAndModule_given_1_number_of_input_pin_should_throw_ERR_INVALID_PIN_NUMBER(void)
 {
-    Module *andModule;
-    Inbit input1a = 1;
-    Inbit input2a = 0;
+    CEXCEPTION_T err;
+    Module *AND;
+    int numberOfPin = 1;
 
-    andModule = createdAndModule(NULL, input1a, input2a);
+    Try{
+        AND = createdAndModule(numberOfPin);
+        TEST_FAIL_MESSAGE("Expected ERR_INVALID_PIN_NUMBER to be thrown. But receive none");
+    } Catch(err)
+    {
+        TEST_ASSERT_EQUAL(ERR_INVALID_PIN_NUMBER, err);
+		printf("Success: Exception generated. Error code: %d.\n", err);
+    }
+}
 
-    TEST_ASSERT_NOT_NULL(andModule);
-    TEST_ASSERT_EQUAL(1, andModule->input1a);
-    TEST_ASSERT_EQUAL(0, andModule->input2a);
-    TEST_ASSERT_EQUAL_PTR(&andEvent, andModule->event);
-    TEST_ASSERT_EQUAL_PTR(&setAnd, andModule->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, andModule->configure);
+void test_createdAndModule_given_2_number_of_input_pin_should_create_module_for_AND_gate(void)
+{
+    Module *AND;
+    int numberOfPin = 2;
+
+    AND = createdAndModule(numberOfPin);
+
+    TEST_ASSERT_NOT_NULL(AND);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->input[0]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->input[1]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->output[0]);
+    TEST_ASSERT_EQUAL_PTR(&andEvent, AND->event);
+    TEST_ASSERT_EQUAL_PTR(&setAnd, AND->set);
+    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, AND->configure);
 	// printf("yes\n");
-    destroyModule(andModule);
+    destroyModule(AND);
 }
 
-void test_createdOrModule_should_create_module_for_OR_gate(void)
+void test_createdAndModule_given_4_number_of_input_pin_should_create_module_for_AND_gate(void)
 {
-    Module *orModule;
-    Inbit input1a = 1;
-    Inbit input2a = 0;
+    Module *AND;
+    int numberOfPin = 4;
 
-    orModule = createdOrModule(NULL, input1a, input2a);
+    AND = createdAndModule(numberOfPin);
 
-    TEST_ASSERT_NOT_NULL(orModule);
-    TEST_ASSERT_EQUAL(1, orModule->input1a);
-    TEST_ASSERT_EQUAL(0, orModule->input2a);
-    TEST_ASSERT_EQUAL_PTR(&orEvent, orModule->event);
-    TEST_ASSERT_EQUAL_PTR(&setOr, orModule->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, orModule->configure);
+    TEST_ASSERT_NOT_NULL(AND);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->input[0]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->input[1]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->input[2]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->input[3]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->output[0]);
+    TEST_ASSERT_EQUAL(UNKNOWN, AND->output[1]);
+    TEST_ASSERT_EQUAL_PTR(&andEvent, AND->event);
+    TEST_ASSERT_EQUAL_PTR(&setAnd, AND->set);
+    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, AND->configure);
 
-    destroyModule(orModule);
+    destroyModule(AND);
 }
 
-void test_createdXorModule_should_create_module_for_XOR_gate(void)
+void test_createdNotModule_given_3_number_of_input_pin_should_create_module_for_NOT_gate(void)
 {
-    Module *xorModule;
-    Inbit input1a = 1;
-    Inbit input2a = 0;
+    Module *NOT;
+    int numberOfPin = 3;
 
-    xorModule = createdXorModule(NULL, input1a, input2a);
+    NOT = createdNotModule(numberOfPin);
 
-    TEST_ASSERT_NOT_NULL(xorModule);
-    TEST_ASSERT_EQUAL(1, xorModule->input1a);
-    TEST_ASSERT_EQUAL(0, xorModule->input2a);
-    TEST_ASSERT_EQUAL_PTR(&xorEvent, xorModule->event);
-    TEST_ASSERT_EQUAL_PTR(&setXor, xorModule->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, xorModule->configure);
+    TEST_ASSERT_NOT_NULL(NOT);
+    TEST_ASSERT_EQUAL(UNKNOWN, NOT->input[0]);
+    TEST_ASSERT_EQUAL(UNKNOWN, NOT->input[1]);
+    TEST_ASSERT_EQUAL(UNKNOWN, NOT->input[2]);
+    TEST_ASSERT_EQUAL(UNKNOWN, NOT->output[0]);
+    TEST_ASSERT_EQUAL(UNKNOWN, NOT->output[1]);
+    TEST_ASSERT_EQUAL(UNKNOWN, NOT->output[2]);
+    TEST_ASSERT_EQUAL_PTR(&notEvent, NOT->event);
+    TEST_ASSERT_EQUAL_PTR(&setNot, NOT->set);
+    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, NOT->configure);
 
-    destroyModule(xorModule);
+    destroyModule(NOT);
 }
 
-void test_createdNandModule_should_create_module_for_NAND_gate(void)
+void test_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to_AND(void)
 {
-    Module *nandModule;
-    Inbit input1a = 1;
-    Inbit input2a = 0;
+    Module *AND;
+    Module *OR;
+    int numberOfOrPin = 4, numberOfAndPin = 2, orOutPin = 2, andInPin = 1;
 
-    nandModule = createdNandModule(NULL, input1a, input2a);
+    OR = createdOrModule(numberOfOrPin);
+    AND = createdAndModule(numberOfAndPin);
 
-    TEST_ASSERT_NOT_NULL(nandModule);
-    TEST_ASSERT_EQUAL(1, nandModule->input1a);
-    TEST_ASSERT_EQUAL(0, nandModule->input2a);
-    TEST_ASSERT_EQUAL_PTR(&nandEvent, nandModule->event);
-    TEST_ASSERT_EQUAL_PTR(&setNand, nandModule->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, nandModule->configure);
+    configureInputOutput((void *)OR, (void *)orOutPin, (void *)AND, (void *)andInPin);
 
-    destroyModule(nandModule);
-}
+    TEST_ASSERT_NOT_NULL(AND);
+    TEST_ASSERT_NOT_NULL(OR);
+    TEST_ASSERT_EQUAL(&AND->input[0], &OR->output[1]);
 
-void test_createdNorModule_should_create_module_for_NOR_gate(void)
-{
-    Module *norModule;
-    Inbit input1a = 1;
-    Inbit input2a = 0;
-
-    norModule = createdNorModule(NULL, input1a, input2a);
-
-    TEST_ASSERT_NOT_NULL(norModule);
-    TEST_ASSERT_EQUAL(1, norModule->input1a);
-    TEST_ASSERT_EQUAL(0, norModule->input2a);
-    TEST_ASSERT_EQUAL_PTR(&norEvent, norModule->event);
-    TEST_ASSERT_EQUAL_PTR(&setNor, norModule->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, norModule->configure);
-
-    destroyModule(norModule);
-}
-
-void test_createdNotModule_should_create_module_for_NOT_gate(void)
-{
-    Module *notModule;
-    Inbit input1a = 1;
-    Inbit input2a = 0;
-
-    notModule = createdNotModule(NULL, input1a, input2a);
-
-    TEST_ASSERT_NOT_NULL(notModule);
-    TEST_ASSERT_EQUAL(1, notModule->input1a);
-    TEST_ASSERT_EQUAL(0, notModule->input2a);
-    TEST_ASSERT_EQUAL_PTR(&notEvent, notModule->event);
-    TEST_ASSERT_EQUAL_PTR(&setNot, notModule->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, notModule->configure);
-
-    destroyModule(notModule);
+    destroyModule(AND);
+    destroyModule(OR);
 }
