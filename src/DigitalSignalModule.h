@@ -54,6 +54,7 @@ struct Pipe
     int stateToFire;
 };
 
+Pipe *createdPipeModule(int numberOfPin);
 Module *createdAndModule(int numberOfPin);
 Module *createdOrModule(int numberOfPin);
 Module *createdXorModule(int numberOfPin);

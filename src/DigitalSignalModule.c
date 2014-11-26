@@ -289,15 +289,12 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
 {
     Module *fromModule = (Module *)thisModule;
     Module *toModule = (Module *)nextModule;
-    int *outPin = (int *)fromPin;
-    int *inPin = (int *)toPin;
-    // int num = *outPin;
+    int outPin = (int)fromPin;
+    int inPin = (int)toPin;
 
-    // outPin = outPin - 1;
-    // *outPin = num + 1;
-    printf("outPin: %d\n", outPin);
-    printf("inPin: %d\n", inPin);
-    // printf("fromModule->output[%d]: %d\n", (outPin)-1, fromModule->output[0]);
+    // printf("outPin: %d\n", ++outPin);
+    // printf("inPin: %d\n", inPin);
+    // printf("fromModule->output[%d]: %d\n", outPin-1, fromModule->output[outPin-1]);
     // toModule->input[inPin-1] = fromModule->output[outPin-1];
 }
 
