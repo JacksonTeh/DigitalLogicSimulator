@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include "DigitalSignalModule.h"
-#include "GenericRedBlackTree.h"
+#include "RedBlackTree.h"
 
 /**
  * Series No.   Description                 Delay
