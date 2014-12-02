@@ -2,12 +2,16 @@
 #define RedBlackTree_H
 
 #include "Node.h"
+#include "DigitalSignalModule.h"
 
-int compareNode(void *node, void *targetNode);
+typedef enum {MODULE_AND_PIN, TIME_NODE} RBT_Type;
 
-void genericAddRedBlackTree(Node **rootPtr, Node *newNode);
-Node *genericDelRedBlackTree(Node **rootPtr, Node *delNode);
-Node *_genericDelRedBlackTree(Node **rootPtr, Node *delNode);
+int compareModuleAndPin(void *moduleAndPin, void *targetModuleAndPin);
+
+void genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT);
+// void genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin);
+// Node *genericDelRedBlackTree(Node **rootPtr, Node *delNode);
+// Node *_genericDelRedBlackTree(Node **rootPtr, Node *delNode);
 
 Node *genericRemoveNextLargerSuccessor(Node **parentPtr);
 

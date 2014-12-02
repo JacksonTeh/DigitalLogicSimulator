@@ -3,7 +3,91 @@
 #include "Rotations.h"
 #include "ErrorCode.h"
 
-void _genericAddRedBlackTree(Node **rootPtr, Node *newNode, int (*compareNode)(void *node, void *targetNode));
+void _genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT, int (*compareNode)(void *node, void *target));
+// void _genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin, int (*compareModuleAndPin)(void *moduleAndPin, void *targetModuleAndPin));
+
+int compareModuleAndPin(void *moduleAndPin, void *targetModuleAndPin)
+{
+    ModuleAndPin *rootNode = (ModuleAndPin *)moduleAndPin;
+    ModuleAndPin *newNode = (ModuleAndPin *)targetModuleAndPin;
+
+    if(rootNode == NULL)
+        return 0;
+    return 1;
+}
+
+// void genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin)
+// {
+    // _genericAddRedBlackTree(rootPtr, newModuleAndPin, compareModuleAndPin);
+    // fixRootViolation(&(*rootPtr));
+    // (*rootPtr)->colour = 'b';
+// }
+
+void genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT)
+{
+    _genericAddRedBlackTree(rootNode, newNode, typeOfRBT, compareModuleAndPin);
+
+    if(typeOfRBT == MODULE_AND_PIN)
+    {
+        // printf("yes\n");
+        ModuleAndPin *root = (ModuleAndPin *)(*rootNode);
+        // printf("root: %p\n", root);
+        // printf("rootNode: %p\n", *rootNode);
+    }
+
+    // fixRootViolation(&(*rootPtr));
+    // root->colour = 'b';
+}
+
+void _genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT, int (*compareNode)(void *node, void *target))
+{
+    // if(typeOfRBT == MODULE_AND_PIN)
+    // {
+        // printf("no\n");
+        // ModuleAndPin *root = (ModuleAndPin *)rootNode;
+        // ModuleAndPin *new = (ModuleAndPin *)newNode;
+    // }
+
+    // if(root == NULL)
+    if(compareNode(*rootNode, newNode) == 0)
+    {
+        *rootNode = newNode;
+        return;
+    }
+
+    // if(new == root)
+        // Throw(ERR_EQUIVALENT_NODE);
+}
+
+// void _genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin, int (*compareModuleAndPin)(void *moduleAndPin, void *targetModuleAndPin))
+// {
+    // ModuleAndPin *root = *rootPtr;
+
+    // if(root == NULL)
+    // {
+        // *rootPtr = newModuleAndPin;
+        // return;
+    // }
+
+    // if(newModuleAndPin == root)
+        // Throw(ERR_EQUIVALENT_NODE);
+    // else if(newNode->data < root->data)
+    // {
+        // _addRedBlackTree(&root->left, newNode);
+        // fixChildViolation(&root);
+    // }
+    // else if(newNode->data > root->data)
+    // {
+        // _addRedBlackTree(&root->right, newNode);
+        // fixChildViolation(&root);
+    // }
+
+    // if(root->left != NULL && root->right != NULL)
+    // {
+        // if(root->left->colour == 'r' && root->right->colour == 'r')     //indicate 4-nodes
+            // fixColourViolation(&root);
+    // }
+// }
 
 void _addRedBlackTree(Node **rootPtr, Node *newNode);
 Node *_delRedBlackTreeX(Node **rootPtr, Node *delNode);

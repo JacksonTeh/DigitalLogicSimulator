@@ -15,3 +15,19 @@ void resetNode(Node *target, int data)
     target->colour = 'b';
     target->data = data;
 }
+
+void setModuleAndPin(ModuleAndPin *target, ModuleAndPin *left, ModuleAndPin *right, char colour)
+{
+    target->left = left;
+    target->right = right;
+    target->colour = colour;
+}
+
+void resetModuleAndPin(ModuleAndPin *target)
+{
+    target->left = NULL;
+    target->right = NULL;
+    target->colour = 'b';
+    target->module = NULL;
+    target->pin = NULL;
+}
