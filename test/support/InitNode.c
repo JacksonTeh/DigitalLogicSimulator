@@ -16,18 +16,15 @@ void resetNode(Node *target, int data)
     target->data = data;
 }
 
-void setModuleAndPin(ModuleAndPin *target, ModuleAndPin *left, ModuleAndPin *right, char colour)
+void setEventTime(EventTime *time, long long data)
 {
-    target->left = left;
-    target->right = right;
-    target->colour = colour;
+    time->time = data;
 }
 
-void resetModuleAndPin(ModuleAndPin *target)
+void genericResetNode(Node *target, void *data)
 {
     target->left = NULL;
     target->right = NULL;
     target->colour = 'b';
-    target->module = NULL;
-    target->pin = NULL;
+    target->dataPtr = data;
 }

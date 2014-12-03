@@ -20,9 +20,9 @@ typedef struct Pin Pin;
 struct ModuleAndPin
 {
     /* RBT */
-    ModuleAndPin *left;
-    ModuleAndPin *right;
-    char colour;
+    // ModuleAndPin *left;
+    // ModuleAndPin *right;
+    // char colour;
     /* data */
     Module *module;
     Pin *pin;

@@ -3,11 +3,13 @@
 
 #include "Node.h"
 #include "DigitalSignalModule.h"
+#include "EventTime.h"
 
 void setNode(Node *target, Node *left, Node *right, char colour);
 void resetNode(Node *target, int data);
 
-void setModuleAndPin(ModuleAndPin *target, ModuleAndPin *left, ModuleAndPin *right, char colour);
-void resetModuleAndPin(ModuleAndPin *target);
+void setEventTime(EventTime *time, long long data);
+
+void genericResetNode(Node *target, void *data);
 
 #endif // InitNode_H

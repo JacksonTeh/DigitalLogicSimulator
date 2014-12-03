@@ -167,8 +167,8 @@ void test_createdPipeModule_should_create_module_for_pipe(void)
     // TEST_ASSERT_EQUAL_PTR(NULL, module);
     TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->module);
     TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->pin);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->left);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->right);
+    // TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->left);
+    // TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->right);
     TEST_ASSERT_EQUAL_PTR(UNKNOWN, pipe->stateToFire);
 
     destroyPipe(pipe);

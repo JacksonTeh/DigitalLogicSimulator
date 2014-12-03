@@ -244,8 +244,8 @@ Pipe *createdPipeModule()
     pipe->moduleAndPin = malloc(sizeof(ModuleAndPin));
     pipe->moduleAndPin->module = NULL;
     pipe->moduleAndPin->pin = NULL;
-    pipe->moduleAndPin->left = NULL;
-    pipe->moduleAndPin->right = NULL;
+    // pipe->moduleAndPin->left = NULL;
+    // pipe->moduleAndPin->right = NULL;
     pipe->stateToFire = UNKNOWN;
 
     return pipe;

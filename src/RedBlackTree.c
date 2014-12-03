@@ -3,85 +3,127 @@
 #include "Rotations.h"
 #include "ErrorCode.h"
 
-void _genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT, int (*compareNode)(void *node, void *target));
-// void _genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin, int (*compareModuleAndPin)(void *moduleAndPin, void *targetModuleAndPin));
+void _genericAddRedBlackTree(Node **rootPtr, Node *newNode, int (*compareNode)(void *node, void *target));
+Node *_genericDelRedBlackTree(Node **rootPtr, Node *delNode, int (*compareNode)(void *node, void *target));
 
-int compareModuleAndPin(void *moduleAndPin, void *targetModuleAndPin)
+int compareModuleAndPin(void *rootPtr, void *newNode)
 {
-    ModuleAndPin *rootNode = (ModuleAndPin *)moduleAndPin;
-    ModuleAndPin *newNode = (ModuleAndPin *)targetModuleAndPin;
+    Node *root = (Node *)rootPtr;
+    Node *new = (Node *)newNode;
 
-    if(rootNode == NULL)
+    ModuleAndPin *rootNode = (ModuleAndPin *)root->dataPtr;
+    ModuleAndPin *newModule = (ModuleAndPin *)new->dataPtr;
+
+    if(rootNode == newModule)
+        return -1;
+    else if(rootNode > newModule)
         return 0;
-
-	if(rootNode == newNode)
-        Throw(ERR_EQUIVALENT_NODE);
-
-    return 1;
+    else if(rootNode < newModule)
+        return 1;
 }
 
-// void genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin)
-// {
-    // _genericAddRedBlackTree(rootPtr, newModuleAndPin, compareModuleAndPin);
-    // fixRootViolation(&(*rootPtr));
-    // (*rootPtr)->colour = 'b';
-// }
-
-void genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT)
+int compareEventTime(void *rootPtr, void *newNode)
 {
-    _genericAddRedBlackTree(rootNode, newNode, typeOfRBT, compareModuleAndPin);
+    Node *root = (Node *)rootPtr;
+    Node *new = (Node *)newNode;
 
-    if(typeOfRBT == MODULE_AND_PIN)
-    {
-        ModuleAndPin *root = (ModuleAndPin *)(*rootNode);
-		root->colour = 'b';
-    }
+    EventTime *rootNode = (EventTime *)root->dataPtr;
+    EventTime *newTime = (EventTime *)new->dataPtr;
 
-    // fixRootViolation(&(*rootPtr));
-    // root->colour = 'b';
+    if(rootNode->time == newTime->time)
+        return -1;
+    else if(rootNode->time > newTime->time)
+        return 0;
+    else if(rootNode->time < newTime->time)
+        return 1;
 }
 
-void _genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT, int (*compareNode)(void *node, void *target))
+void genericAddRedBlackTree(Node **rootPtr, Node *newNode, int (*compareNode)(void *node, void *target))
 {
-    if(compareNode(*rootNode, newNode) == 0)
+    _genericAddRedBlackTree(rootPtr, newNode, compareNode);
+    fixRootViolation(&(*rootPtr));
+    (*rootPtr)->colour = 'b';
+}
+
+void _genericAddRedBlackTree(Node **rootPtr, Node *newNode, int (*compareNode)(void *node, void *target))
+{
+    Node *root = *rootPtr;
+
+    if(root == NULL)
     {
-        *rootNode = newNode;
+        *rootPtr = newNode;
         return;
     }
 
-	// if(new == root)
-        // Throw(ERR_EQUIVALENT_NODE);
+    if(compareNode((void *)root, (void *)newNode) == -1)
+        Throw(ERR_EQUIVALENT_NODE);
+    else if(compareNode((void *)root, (void *)newNode) == 0)
+    {
+        _genericAddRedBlackTree(&root->left, newNode, compareNode);
+        fixChildViolation(&root);
+    }
+    else if(compareNode((void *)root, (void *)newNode) == 1)
+    {
+        _genericAddRedBlackTree(&root->right, newNode, compareNode);
+        fixChildViolation(&root);
+    }
+
+    if(root->left != NULL && root->right != NULL)
+    {
+        if(root->left->colour == 'r' && root->right->colour == 'r')     //indicate 4-nodes
+            fixColourViolation(&root);
+    }
 }
 
-// void _genericAddRedBlackTree(ModuleAndPin **rootPtr, ModuleAndPin *newModuleAndPin, int (*compareModuleAndPin)(void *moduleAndPin, void *targetModuleAndPin))
-// {
-    // ModuleAndPin *root = *rootPtr;
+Node *genericDelRedBlackTree(Node **rootPtr, Node *delNode, int (*compareNode)(void *node, void *target))
+{
+    Node *node = _genericDelRedBlackTree(rootPtr, delNode, compareNode);
 
-    // if(root == NULL)
-    // {
-        // *rootPtr = newModuleAndPin;
-        // return;
-    // }
+    if((*rootPtr) != NULL)
+        (*rootPtr)->colour = 'b';
 
-    // if(newModuleAndPin == root)
-        // Throw(ERR_EQUIVALENT_NODE);
-    // else if(newNode->data < root->data)
-    // {
-        // _addRedBlackTree(&root->left, newNode);
-        // fixChildViolation(&root);
-    // }
-    // else if(newNode->data > root->data)
-    // {
-        // _addRedBlackTree(&root->right, newNode);
-        // fixChildViolation(&root);
-    // }
+    return node;
+}
 
-    // if(root->left != NULL && root->right != NULL)
-    // {
-        // if(root->left->colour == 'r' && root->right->colour == 'r')     //indicate 4-nodes
-            // fixColourViolation(&root);
-    // }
-// }
+Node *_genericDelRedBlackTree(Node **rootPtr, Node *delNode, int (*compareNode)(void *node, void *target))
+{
+    Node *root = *rootPtr;
+    Node *node, *successorNode;
+
+    if(root == NULL)
+        Throw(ERR_NODE_UNAVAILABLE);
+
+    if(compareNode((void *)root, (void *)delNode) == -1)
+    {
+        if((*rootPtr)->right == NULL)
+            successorNode = removeNextLargerSuccessor(&(*rootPtr)->left);
+        else
+            successorNode = removeNextLargerSuccessor(&(*rootPtr)->right);
+
+        if(successorNode != root->right)
+            successorNode->right = (*rootPtr)->right;
+
+        if(successorNode != NULL)
+        {
+            successorNode->colour = (*rootPtr)->colour;
+            *rootPtr = successorNode;
+            (*rootPtr)->left = root->left;
+            selectCases(&(*rootPtr), root);
+        }
+        else
+            *rootPtr = NULL;
+
+        return root;
+    }
+    else if(compareNode((void *)root, (void *)delNode) == 1)
+        node = _genericDelRedBlackTree(&root->right, delNode, compareNode);
+    else if(compareNode((void *)root, (void *)delNode) == 0)
+        node = _genericDelRedBlackTree(&root->left, delNode, compareNode);
+
+    selectCases(&(*rootPtr), node);
+
+    return node;
+}
 
 void _addRedBlackTree(Node **rootPtr, Node *newNode);
 Node *_delRedBlackTreeX(Node **rootPtr, Node *delNode);

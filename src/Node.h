@@ -9,6 +9,7 @@ struct Node
     Node *right;
     char colour;    //'b' or 'r' or 'd' (black or red or double black)
     int data;
+    void *dataPtr;
 };
 
 #endif // Node_H
