@@ -13,6 +13,10 @@ int compareModuleAndPin(void *moduleAndPin, void *targetModuleAndPin)
 
     if(rootNode == NULL)
         return 0;
+
+	if(rootNode == newNode)
+        Throw(ERR_EQUIVALENT_NODE);
+
     return 1;
 }
 
@@ -29,10 +33,8 @@ void genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT)
 
     if(typeOfRBT == MODULE_AND_PIN)
     {
-        // printf("yes\n");
         ModuleAndPin *root = (ModuleAndPin *)(*rootNode);
-        // printf("root: %p\n", root);
-        // printf("rootNode: %p\n", *rootNode);
+		root->colour = 'b';
     }
 
     // fixRootViolation(&(*rootPtr));
@@ -41,21 +43,13 @@ void genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT)
 
 void _genericAddRedBlackTree(void **rootNode, void *newNode, int typeOfRBT, int (*compareNode)(void *node, void *target))
 {
-    // if(typeOfRBT == MODULE_AND_PIN)
-    // {
-        // printf("no\n");
-        // ModuleAndPin *root = (ModuleAndPin *)rootNode;
-        // ModuleAndPin *new = (ModuleAndPin *)newNode;
-    // }
-
-    // if(root == NULL)
     if(compareNode(*rootNode, newNode) == 0)
     {
         *rootNode = newNode;
         return;
     }
 
-    // if(new == root)
+	// if(new == root)
         // Throw(ERR_EQUIVALENT_NODE);
 }
 

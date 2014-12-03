@@ -43,7 +43,7 @@ void test_genericAddRedBlackTree_add_moduleAndPin_1_to_empty_tree(void)
  *                 add moduleAndPin_1
  * root -> 1(b)  ---------------------> Throw ERR_EQUIVALENT_NODE
  */
-void xtest_addRedBlackTree_add_moduleAndPin_1_to_use_tree_with_only_moduleAndPin_1_should_throw_ERR_EQUIVALENT_NODE(void)
+void test_addRedBlackTree_add_moduleAndPin_1_to_use_tree_with_only_moduleAndPin_1_should_throw_ERR_EQUIVALENT_NODE(void)
 {
     CEXCEPTION_T err;
     setModuleAndPin(&moduleAndPin_1, NULL, NULL, 'b');
