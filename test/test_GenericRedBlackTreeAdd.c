@@ -12,10 +12,9 @@
 // #define TIME_2ns 500000000
 // #define TIME_4ns 250000000
 
-Node            nodeA,          nodeB,          nodeC,          nodeD;
-//                |               |               |               |
-//                v               v               v               v
-ModuleAndPin moduleAndPin_1, moduleAndPin_2, moduleAndPin_3, moduleAndPin_4;    //dataPtr
+
+Node nodeA, nodeB, nodeC, nodeD;
+ModuleAndPin moduleAndPin[4];   //dataPtr
 
 Node       node1,    node2,    node4;
 //           |         |         |
@@ -24,10 +23,10 @@ EventTime time_1ns, time_2ns, time_4ns;    //dataPtr
 
 void setUp(void)
 {
-    genericResetNode(&nodeA, (void *)&moduleAndPin_1);
-    genericResetNode(&nodeB, (void *)&moduleAndPin_2);
-    genericResetNode(&nodeC, (void *)&moduleAndPin_3);
-    genericResetNode(&nodeD, (void *)&moduleAndPin_4);
+    genericResetNode(&nodeA, (void *)&moduleAndPin[0]);
+    genericResetNode(&nodeB, (void *)&moduleAndPin[1]);
+    genericResetNode(&nodeC, (void *)&moduleAndPin[2]);
+    genericResetNode(&nodeD, (void *)&moduleAndPin[3]);
 
     setEventTime(&time_1ns, 1);
     setEventTime(&time_2ns, 2);
@@ -48,19 +47,11 @@ void test_compareModuleAndPin_given_nodeA_and_nodeA_as_newNode_should_return_neg
 
 void test_compareModuleAndPin_given_nodeA_and_nodeB_as_newNode_should_return_1(void)
 {
-    printf("NodeA: %p\n", &nodeA);
-    printf("NodeB: %p\n", &nodeB);
-    printf("NodeC: %p\n", &nodeC);
-    printf("NodeD: %p\n\n", &nodeD);
     TEST_ASSERT_EQUAL(1, compareModuleAndPin((void *)&nodeA, (void *)&nodeB));
 }
 
 void test_compareModuleAndPin_given_nodeB_and_nodeA_as_newNode_should_return_0(void)
 {
-    printf("NodeA: %p\n", &nodeA);
-    printf("NodeB: %p\n", &nodeB);
-    printf("NodeC: %p\n", &nodeC);
-    printf("NodeD: %p\n", &nodeD);
     TEST_ASSERT_EQUAL(0, compareModuleAndPin((void *)&nodeB, (void *)&nodeA));
 }
 
