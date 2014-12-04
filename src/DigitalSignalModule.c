@@ -289,11 +289,11 @@ void destroyPipe(Pipe *pipe)
     }
 }
 
-void destroyNode(Node *node)
-{
-    if(node != NULL)
-        free(node);
-}
+// void destroyNode(Node *node)
+// {
+    // if(node != NULL)
+        // free(node);
+// }
 
 ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
 {

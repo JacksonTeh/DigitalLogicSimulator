@@ -38,7 +38,7 @@ void setUp(void)
 void tearDown(void)
 {
 }
-
+/*
 void changeRootByVal(Node *node, Node *newNode)
 {
     node = newNode;
@@ -73,7 +73,7 @@ void xtest_changeRootByRef()
     printf("root is node %d with address %x\n", root->data, root);
     changeRootByRef(&root, &node5);
     printf("root is node %d with address %x\n\n", root->data, root);
-}
+} */
 
 /**
  * root ->  10

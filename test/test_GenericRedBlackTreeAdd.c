@@ -35,12 +35,6 @@ void setUp(void)
     genericResetNode(&node1, (void *)&time_1ns);
     genericResetNode(&node2, (void *)&time_2ns);
     genericResetNode(&node4, (void *)&time_4ns);
-    // resetModuleAndPin(&moduleAndPin_1);
-    // resetModuleAndPin(&moduleAndPin_2);
-    // resetModuleAndPin(&moduleAndPin_3);
-    // resetModuleAndPin(&moduleAndPin_4);
-    // resetModuleAndPin(&moduleAndPin_5);
-    // resetModuleAndPin(&moduleAndPin_6);
 }
 
 void tearDown(void)
@@ -54,11 +48,15 @@ void test_compareModuleAndPin_given_nodeA_and_nodeA_as_newNode_should_return_neg
 
 void test_compareModuleAndPin_given_nodeA_and_nodeB_as_newNode_should_return_1(void)
 {
+    printf("NodeA: %p\n", nodeA);
+    printf("NodeB: %p\n", nodeB);
     TEST_ASSERT_EQUAL(1, compareModuleAndPin((void *)&nodeA, (void *)&nodeB));
 }
 
 void test_compareModuleAndPin_given_nodeB_and_nodeA_as_newNode_should_return_0(void)
 {
+    printf("NodeA: %p\n", nodeA);
+    printf("NodeB: %p\n", nodeB);
     TEST_ASSERT_EQUAL(0, compareModuleAndPin((void *)&nodeB, (void *)&nodeA));
 }
 
