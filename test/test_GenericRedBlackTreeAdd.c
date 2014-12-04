@@ -48,15 +48,19 @@ void test_compareModuleAndPin_given_nodeA_and_nodeA_as_newNode_should_return_neg
 
 void test_compareModuleAndPin_given_nodeA_and_nodeB_as_newNode_should_return_1(void)
 {
-    printf("NodeA: %p\n", nodeA);
-    printf("NodeB: %p\n", nodeB);
+    printf("NodeA: %p\n", &nodeA);
+    printf("NodeB: %p\n", &nodeB);
+    printf("NodeC: %p\n", &nodeC);
+    printf("NodeD: %p\n\n", &nodeD);
     TEST_ASSERT_EQUAL(1, compareModuleAndPin((void *)&nodeA, (void *)&nodeB));
 }
 
 void test_compareModuleAndPin_given_nodeB_and_nodeA_as_newNode_should_return_0(void)
 {
-    printf("NodeA: %p\n", nodeA);
-    printf("NodeB: %p\n", nodeB);
+    printf("NodeA: %p\n", &nodeA);
+    printf("NodeB: %p\n", &nodeB);
+    printf("NodeC: %p\n", &nodeC);
+    printf("NodeD: %p\n", &nodeD);
     TEST_ASSERT_EQUAL(0, compareModuleAndPin((void *)&nodeB, (void *)&nodeA));
 }
 
