@@ -1,6 +1,8 @@
 #ifndef DigitalSignalModule_H
 #define DigitalSignalModule_H
 
+#include "Node.h"
+
 #define TOTAL_PIN       14
 
 typedef enum {QUAD_2_INPUT, TRI_3_INPUT, DUAL_4_INPUT, HEX_INV} InputType;
@@ -55,7 +57,8 @@ struct Pipe
     int (*event)(void *object);
     void (*set)(void *pin, void *state);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
-    ModuleAndPin *moduleAndPin;
+    Node *data;
+    // ModuleAndPin *moduleAndPin;
     int stateToFire;
 };
 
@@ -63,6 +66,9 @@ Pipe *createdPipeModule();
 int pipeEvent(void *module);
 void setPipe(void *pin, void *state);
 void destroyPipe(Pipe *pipe);
+void addPipeModuleData(Pipe **pipe, Node *newNode);
+
+ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
 Module *createdAndModule(int inputType);
