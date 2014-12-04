@@ -320,12 +320,13 @@ void test_configureInputOutput_given_invalid_output_pin_should_throw_ERR_NOT_OUT
     CEXCEPTION_T err;
     Module *AND, *OR;
 
-    int inputType = QUAD_2_INPUT, orPinNum = 2, andPinNum = 1;
+    int inputType = QUAD_2_INPUT;/* , orPinNum = 2, andPinNum = 1; */
 
     Try{
         OR = createdOrModule(inputType);
         AND = createdAndModule(inputType);
-        OR->configure((void *)OR, (void *)orPinNum, (void *)AND, (void *)andPinNum);
+        OR->configure((void *)OR, (void *)&OR->pin[1], (void *)AND, (void *)&AND->pin[0]);
+        // OR->configure((void *)OR, (void *)orPinNum, (void *)AND, (void *)andPinNum);
         TEST_FAIL_MESSAGE("Should generate an exception due to ERR_NOT_OUT_PIN.");
     } Catch(err) {
         TEST_ASSERT_EQUAL_MESSAGE(ERR_NOT_OUT_PIN, err, "Expected ERR_NOT_OUT_PIN exception");
@@ -341,12 +342,13 @@ void test_configureInputOutput_given_invalid_input_pin_should_throw_ERR_NOT_IN_P
     CEXCEPTION_T err;
     Module *AND, *OR;
 
-    int inputType = QUAD_2_INPUT, orPinNum = 10, andPinNum = 10;
+    int inputType = QUAD_2_INPUT;/* , orPinNum = 10, andPinNum = 10; */
 
     Try{
         OR = createdOrModule(inputType);
         AND = createdAndModule(inputType);
-        OR->configure((void *)OR, (void *)orPinNum, (void *)AND, (void *)andPinNum);
+        OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[9]);
+        // OR->configure((void *)OR, (void)orPinNum, (void *)AND, (void)andPinNum);
         TEST_FAIL_MESSAGE("Should generate an exception due to ERR_NOT_IN_PIN.");
     } Catch(err) {
         TEST_ASSERT_EQUAL_MESSAGE(ERR_NOT_IN_PIN, err, "Expected ERR_NOT_IN_PIN exception");
@@ -362,15 +364,16 @@ void test_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to
     Module *AND, *OR, *result;
     Pipe *pipe;
 
-    int inputType = QUAD_2_INPUT, orPinNum = 10, andPinNum = 1;
+    int inputType = QUAD_2_INPUT;/* , orPinNum = 10, andPinNum = 1; */
 
     OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
 
     // printf("(OR->pin[orOutPin-1]).type: %d\n", (OR->pin[orOutPin-1]).type);
-    OR->configure((void *)OR, (void *)orPinNum, (void *)AND, (void *)andPinNum);
+    OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0]);
+    // OR->configure((void *)OR, (void)orPinNum, (void *)AND, (void)andPinNum);
     // printf("(OR->pin[orOutPin-1]).type: %d\n", (OR->pin[orOutPin-1]).type);
-    pipe = (OR->pin[orPinNum-1]).pipe;
+    pipe = (OR->pin[9]).pipe;
     // result = (Module *)pipe->data->dataPtr;
     
     TEST_ASSERT_NOT_NULL(AND);

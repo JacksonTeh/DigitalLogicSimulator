@@ -317,22 +317,28 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
     Module *fromModule = (Module *)thisModule;
     Module *toModule = (Module *)nextModule;
     Pipe *pipe;
-    int outPin = (int)fromPin;
-    int inPin = (int)toPin;
+    Pin *sourcePin = (Pin *)fromPin;
+    Pin *destPin = (Pin *)toPin;
+    // int outPin = (int)fromPin;
+    // int inPin = (int)toPin;
 
     // printf("outPin: %d\n", outPin - 1);
     // printf("(fromModule->pin[outPin-1]).type: %d\n", (fromModule->pin[outPin-1]).type);
-    if((fromModule->pin[outPin-1]).type != OUTPUT_PIN)
+    // if((fromModule->pin[outPin-1]).type != OUTPUT_PIN)
+    if(sourcePin->type != OUTPUT_PIN)
         Throw(ERR_NOT_OUT_PIN);
 
-    if((toModule->pin[inPin-1]).type != INPUT_PIN)
+    // if((toModule->pin[inPin-1]).type != INPUT_PIN)
+    if(destPin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
 
-    if((fromModule->pin[outPin-1]).pipe == NULL && (fromModule->pin[outPin-1]).type == OUTPUT_PIN)
+    // if((fromModule->pin[outPin-1]).pipe == NULL && (fromModule->pin[outPin-1]).type == OUTPUT_PIN)
+    if(sourcePin->pipe == NULL)
     {
         printf("yes\n");
         pipe = createdPipeModule();
-        (fromModule->pin[outPin-1]).pipe = pipe;
+        // (fromModule->pin[outPin-1]).pipe = pipe;
+        sourcePin->pipe = pipe;
     }
 
     // addPipeModuleData(&pipe, &newNode);
