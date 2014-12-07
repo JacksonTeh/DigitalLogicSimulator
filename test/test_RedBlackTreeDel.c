@@ -427,7 +427,7 @@ void test_delRedBlackTree_remove_20_from_tree_with_1_5_7_10_13_15_20_nodes(void)
  *     10(r)                    10(r)                     15(r)
  *    /    \      remove 5     //   \                     /   \
  *  5(b)  15(b)  ----------> NULL  15(b)   ----------> 10(b) 20(b)
- *            \                        \ 
+ *            \                        \
  *           20(r)                    20(r)
  */
 void test_delRedBlackTree_remove_5_from_tree_with_5_10_15_20_nodes_with_case_1(void)
@@ -453,7 +453,7 @@ void test_delRedBlackTree_remove_5_from_tree_with_5_10_15_20_nodes_with_case_1(v
  *       10(r)                     10(r)                   5(r)
  *      /    \      remove 15     /   \\                  /   \
  *    5(b)  15(b)  ---------->  5(b)  NULL ---------->  1(b) 10(b)
- *    /                         / 
+ *    /                         /
  *  1(r)                      1(r)
  */
 void test_delRedBlackTree_remove_15_from_tree_with_1_5_10_15_nodes_with_case_1(void)
@@ -479,7 +479,7 @@ void test_delRedBlackTree_remove_15_from_tree_with_1_5_10_15_nodes_with_case_1(v
  *     10(b)                    10(b)                     13(b)
  *    /    \      remove 5     //   \                    /   \
  *  5(b)  15(b)  ----------> NULL  15(b)  ----------> 10(b) 15(b)
- *        /                        / 
+ *        /                        /
  *     13(r)                    13(r)
  */
 void test_delRedBlackTree_remove_5_from_tree_with_5_10_13_15_nodes_with_case_1(void)
@@ -505,7 +505,7 @@ void test_delRedBlackTree_remove_5_from_tree_with_5_10_13_15_nodes_with_case_1(v
  *       10(r)                     10(r)                   7(r)
  *      /    \      remove 15     /   \\                  /   \
  *    5(b)  15(b)  ---------->  5(b)  NULL ---------->  5(b) 10(b)
- *       \                         \ 
+ *       \                         \
  *      7(r)                      7(r)
  */
 void test_delRedBlackTree_remove_15_from_tree_with_5_7_10_15_nodes_with_case_1(void)

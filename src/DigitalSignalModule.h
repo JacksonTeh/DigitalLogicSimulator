@@ -43,6 +43,7 @@ struct Module
 {
     int (*event)(void *object);
     void (*set)(void *pin, void *state);
+    // Module *(*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
     int totalPin;
     Pin pin[TOTAL_PIN];
@@ -68,6 +69,8 @@ void setPipe(void *pin, void *state);
 void destroyPipe(Pipe *pipe);
 void addPipeModuleData(Pipe **pipe, Node *newNode);
 
+void destroyNodeDataPtr(Node *node);
+
 ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
@@ -91,6 +94,7 @@ int norEvent(void *module);
 void setNor(void *pin, void *state);
 int notEvent(void *module);
 void setNot(void *pin, void *state);
+// Module *configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 
 void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);

@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include "DigitalSignalModule.h"
 #include "RedBlackTree.h"
+#include "InitNode.h"
 
 /**
  * Series No.   Description                 Delay
@@ -226,8 +227,12 @@ void destroyModule(Module *module)
 
     if(module != NULL)
     {
+        printf("module: %p\n", module);
+
         for(i = 0; i < TOTAL_PIN; i++)
+        {
             destroyPipe((module->pin[i]).pipe);
+        }
 
         free(module);
     }
@@ -265,10 +270,6 @@ void setPipe(void *pin, void *state)
 
 void addPipeModuleData(Pipe **pipe, Node *newNode)
 {
-    // Node *newNode;
-
-    // newNode->dataPtr = (void *)moduleAndPin;
-
     genericAddRedBlackTree(&(*pipe)->data, newNode, compareModuleAndPin);
 }
 
@@ -279,21 +280,28 @@ void destroyPipe(Pipe *pipe)
         // if(pipe->moduleAndPin != NULL)
             // destroyModuleAndPin(pipe->moduleAndPin);
 
-        // if(pipe->data != NULL)
-            // free(pipe->data);
-
-        // if(pipe->data != NULL)
-            // free(pipe->data);
-
+        printf("pipe: %p\n", pipe);
+        destroyNodeDataPtr(pipe->data);
         free(pipe);
     }
 }
 
-// void destroyNode(Node *node)
-// {
-    // if(node != NULL)
-        // free(node);
-// }
+void destroyNodeDataPtr(Node *node)
+{
+    if(node != NULL)
+    {
+        if(node->left != NULL)
+            printf("node->left: %p\n", node->left);
+            // destroyNodeDataPtr(node->left);
+
+        if(node->right != NULL)
+            printf("node->right: %p\n", node->right);
+            // destroyNodeDataPtr(node->right);
+
+        ModuleAndPin *moduleAndPin = (ModuleAndPin *)node->dataPtr;
+        destroyModuleAndPin(moduleAndPin);
+    }
+}
 
 ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
 {
@@ -301,52 +309,79 @@ ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
 
     moduleAndPin = malloc(sizeof(ModuleAndPin));
     moduleAndPin->module = module;
-    moduleAndPin->pin = &module->pin[pinNum-1];
+    moduleAndPin->pin = &module->pin[pinNum];
 
     return moduleAndPin;
 }
 
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin)
 {
+    printf("moduleAndPin: %p\n", moduleAndPin);
     if(moduleAndPin != NULL)
         free(moduleAndPin);
 }
 
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin)
 {
+    Node newNode;
+    Pipe *pipe;
+    ModuleAndPin *nextModuleAndPin;
     Module *fromModule = (Module *)thisModule;
     Module *toModule = (Module *)nextModule;
-    Pipe *pipe;
     Pin *sourcePin = (Pin *)fromPin;
     Pin *destPin = (Pin *)toPin;
-    // int outPin = (int)fromPin;
-    // int inPin = (int)toPin;
 
-    // printf("outPin: %d\n", outPin - 1);
-    // printf("(fromModule->pin[outPin-1]).type: %d\n", (fromModule->pin[outPin-1]).type);
-    // if((fromModule->pin[outPin-1]).type != OUTPUT_PIN)
     if(sourcePin->type != OUTPUT_PIN)
         Throw(ERR_NOT_OUT_PIN);
 
-    // if((toModule->pin[inPin-1]).type != INPUT_PIN)
     if(destPin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
+
+    nextModuleAndPin = createdModuleAndPin(toModule, destPin->pinNumber);
+    genericResetNode(&newNode, (void *)nextModuleAndPin);
+    setNode(&newNode, NULL, NULL, 'r');
+    // printf("toModule: %p\n", toModule);
+    // printf("nextModuleAndPin->module: %p\n", nextModuleAndPin->module);
+    // printf("destPin: %p\n", destPin);
+    // printf("nextModuleAndPin->pin: %p\n", nextModuleAndPin->pin);
+    // printf("nextModuleAndPin: %p\n", nextModuleAndPin);
+    // printf("newNode.dataPtr: %p\n", newNode.dataPtr);
 
     // if((fromModule->pin[outPin-1]).pipe == NULL && (fromModule->pin[outPin-1]).type == OUTPUT_PIN)
     if(sourcePin->pipe == NULL)
     {
-        printf("yes\n");
+        // printf("yes\n");
         pipe = createdPipeModule();
         // (fromModule->pin[outPin-1]).pipe = pipe;
-        sourcePin->pipe = pipe;
+        (fromModule->pin[sourcePin->pinNumber]).pipe = pipe;
+        // sourcePin->pipe = pipe;
+        // printf("sourcePin->pipe->data: %p\n", sourcePin->pipe->data);
+        // printf("(fromModule->pin[sourcePin->pinNumber]).pipe: %p\n", (fromModule->pin[sourcePin->pinNumber]).pipe);
+        printf("((fromModule->pin[sourcePin->pinNumber]).pipe)->data: %p\n", ((fromModule->pin[sourcePin->pinNumber]).pipe)->data);
     }
 
-    // addPipeModuleData(&pipe, &newNode);
+    printf("newNode: %p\n", &newNode);
+    printf("&newNode.left: %p\n", &newNode.left);
+    printf("&newNode.right: %p\n", &newNode.right);
+    printf("newNode.left: %p\n", newNode.left);
+    printf("newNode.right: %p\n", newNode.right);
+    // ((fromModule->pin[sourcePin->pinNumber]).pipe)->data = &newNode;
+    addPipeModuleData(&(fromModule->pin[sourcePin->pinNumber]).pipe, &newNode);
+    // addPipeModuleData(&sourcePin->pipe, &newNode);
+    // printf("!!sourcePin->pipe->data: %p\n", sourcePin->pipe->data);
+    printf("!!((fromModule->pin[sourcePin->pinNumber]).pipe)->data: %p\n", ((fromModule->pin[sourcePin->pinNumber]).pipe)->data);
+    printf("!!&((fromModule->pin[sourcePin->pinNumber]).pipe)->data->left: %p\n", &((fromModule->pin[sourcePin->pinNumber]).pipe)->data->left);
+    printf("!!&((fromModule->pin[sourcePin->pinNumber]).pipe)->data->right: %p\n", &((fromModule->pin[sourcePin->pinNumber]).pipe)->data->right);
+    printf("!!((fromModule->pin[sourcePin->pinNumber]).pipe)->data->left: %p\n", ((fromModule->pin[sourcePin->pinNumber]).pipe)->data->left);
+    printf("!!((fromModule->pin[sourcePin->pinNumber]).pipe)->data->right: %p\n", ((fromModule->pin[sourcePin->pinNumber]).pipe)->data->right);
+    // printf("sourcePin->pipe->data->left: %p\n", sourcePin->pipe->data->left);
+    // printf("sourcePin->pipe->data->right: %p\n", sourcePin->pipe->data->right);
     // pipeAttach(&(fromModule->pin[outPin-1]).pipe/* , &fromModule */, outPin, &toModule, inPin);
     // printf("outPin: %d\n", ++outPin);
     // printf("inPin: %d\n", inPin);
     // printf("fromModule->output[%d]: %d\n", outPin-1, fromModule->output[outPin-1]);
     // toModule->input[inPin-1] = fromModule->output[outPin-1];
+    // return fromModule;
 }
 
 int determineNumOfInputPin(int inputType)

@@ -75,6 +75,21 @@ void test_genericAddRedBlackTree_add_nodeA_to_tree_with_only_nodeA_should_throw_
 }
 
 /** 2-node case
+ *                 add A
+ * root -> NULL  --------> A(b)
+ */
+void test_genericAddRedBlackTree_add_nodeA_to_empty_tree(void)
+{
+    setNode(&nodeA, NULL, NULL, 'r');
+    Node *root = NULL;
+
+    genericAddRedBlackTree(&root, &nodeA, compareModuleAndPin);
+
+    TEST_ASSERT_EQUAL_PTR(&nodeA, root);
+    TEST_ASSERT_EQUAL_NODE(NULL, NULL, 'b', &nodeA);
+}
+
+/** 2-node case
  *                 add A      B(b)
  * root -> B(b)  -------->   /
  *                         A(r)
@@ -123,6 +138,21 @@ void test_compareEventTime_given_node2_and_node1_as_newNode_should_return_0(void
 void test_compareEventTime_given_node1_and_node2_as_newNode_should_return_1(void)
 {
     TEST_ASSERT_EQUAL(1, compareEventTime((void *)&node1, (void *)&node2));
+}
+
+/** 2-node case
+ *                 add 1
+ * root -> NULL  --------> 1(b)
+ */
+void test_genericAddRedBlackTree_add_node1_to_empty_tree(void)
+{
+    setNode(&node1, NULL, NULL, 'r');
+    Node *root = NULL;
+
+    genericAddRedBlackTree(&root, &node1, compareEventTime);
+
+    TEST_ASSERT_EQUAL_PTR(&node1, root);
+    TEST_ASSERT_EQUAL_NODE(NULL, NULL, 'b', &node1);
 }
 
 /** 2-node case
