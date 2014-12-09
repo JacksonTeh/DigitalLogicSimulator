@@ -42,6 +42,7 @@ Module *createdAndModule(int inputType)
     AND->set = setAnd;
     AND->configure = configureInputOutput;
     AND->totalPin = TOTAL_PIN;
+    // AND->pipe = NULL;
 
     if(inputType == HEX_INV)
         Throw(ERR_INVALID_INPUT_TYPE);
@@ -99,6 +100,7 @@ Module *createdOrModule(int inputType)
     OR->set = setAnd;
     OR->configure = configureInputOutput;
     OR->totalPin = TOTAL_PIN;
+    // OR->pipe = NULL;
 
     if(inputType == HEX_INV)
         Throw(ERR_INVALID_INPUT_TYPE);
@@ -227,7 +229,7 @@ void destroyModule(Module *module)
 
     if(module != NULL)
     {
-        printf("module: %p\n", module);
+        // printf("module: %p\n", module);
 
         for(i = 0; i < TOTAL_PIN; i++)
         {
@@ -268,10 +270,10 @@ void setPipe(void *pin, void *state)
 
 }
 
-void addPipeModuleData(Pipe **pipe, Node *newNode)
-{
-    genericAddRedBlackTree(&(*pipe)->data, newNode, compareModuleAndPin);
-}
+// void addPipeModuleData(Pipe **pipe, Node *newNode)
+// {
+    // genericAddRedBlackTree(&(*pipe)->data, newNode, compareModuleAndPin);
+// }
 
 void destroyPipe(Pipe *pipe)
 {
@@ -280,7 +282,7 @@ void destroyPipe(Pipe *pipe)
         // if(pipe->moduleAndPin != NULL)
             // destroyModuleAndPin(pipe->moduleAndPin);
 
-        printf("pipe: %p\n", pipe);
+        // printf("pipe: %p\n", pipe);
         destroyNodeDataPtr(pipe->data);
         free(pipe);
     }
@@ -316,11 +318,42 @@ ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
 
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin)
 {
-    printf("moduleAndPin: %p\n", moduleAndPin);
+    // printf("moduleAndPin: %p\n", moduleAndPin);
     if(moduleAndPin != NULL)
         free(moduleAndPin);
 }
 
+void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin)
+{
+    Module *sourceModule = (Module *)thisModule;
+    Module *destModule = (Module *)nextModule;
+    Pin *sourcePin = (Pin *)fromPin;
+    Pin *destPin = (Pin *)toPin;
+    Pipe *pipe;
+    ModuleAndPin nextModuleAndPin = {destModule, destPin};
+    Node newNode;
+
+    if(sourcePin->type != OUTPUT_PIN)
+        Throw(ERR_NOT_OUT_PIN);
+
+    if(destPin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    if((sourceModule->pin[sourcePin->pinNumber]).pipe == NULL)
+    {
+        pipe = createdPipeModule();
+        (sourceModule->pin[sourcePin->pinNumber]).pipe = pipe;
+    }
+    else
+    {
+        destPin->state = ((sourceModule->pin[sourcePin->pinNumber]).pipe)->stateToFire;
+        // nextModuleAndPin = createdModuleAndPin(destModule, destPin->pinNumber);
+        genericResetNode(&newNode, (void *)&nextModuleAndPin);
+        setNode(&newNode, NULL, NULL, 'r');
+        genericAddRedBlackTree(&((sourceModule->pin[sourcePin->pinNumber]).pipe)->data, &newNode, compareModuleAndPin);
+    }
+}
+/*
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin)
 {
     Node newNode;
@@ -376,13 +409,13 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
     printf("!!((fromModule->pin[sourcePin->pinNumber]).pipe)->data->right: %p\n", ((fromModule->pin[sourcePin->pinNumber]).pipe)->data->right);
     // printf("sourcePin->pipe->data->left: %p\n", sourcePin->pipe->data->left);
     // printf("sourcePin->pipe->data->right: %p\n", sourcePin->pipe->data->right);
-    // pipeAttach(&(fromModule->pin[outPin-1]).pipe/* , &fromModule */, outPin, &toModule, inPin);
+    // pipeAttach(&(fromModule->pin[outPin-1]).pipe, outPin, &toModule, inPin);
     // printf("outPin: %d\n", ++outPin);
     // printf("inPin: %d\n", inPin);
     // printf("fromModule->output[%d]: %d\n", outPin-1, fromModule->output[outPin-1]);
     // toModule->input[inPin-1] = fromModule->output[outPin-1];
     // return fromModule;
-}
+} */
 
 int determineNumOfInputPin(int inputType)
 {

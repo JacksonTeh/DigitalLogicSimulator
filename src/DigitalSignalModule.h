@@ -10,8 +10,6 @@ typedef enum {LOW, HIGH, UNKNOWN} State;
 typedef enum {INPUT_PIN, OUTPUT_PIN, UNUSED_PIN} TypeOfPin;
 typedef enum {ERR_NO_ERROR, ERR_INVALID_INPUT_TYPE, ERR_INVALID_NUM_OF_PIN, ERR_NOT_OUT_PIN, ERR_NOT_IN_PIN} Error;
 
-// typedef int Inbit;
-// typedef int Outbit;
 typedef int PinType;
 
 typedef struct Module Module;
@@ -32,7 +30,7 @@ struct ModuleAndPin
 
 struct Pin
 {
-    // Module *moduleConnected;    //module that is connected to
+    // void *moduleConnected;    //module that is connected to
     Pipe *pipe;
     int pinNumber;              //pin of the module connected to
     int state;
@@ -43,14 +41,11 @@ struct Module
 {
     int (*event)(void *object);
     void (*set)(void *pin, void *state);
-    // Module *(*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
     int totalPin;
+    Pipe *pipe;
     Pin pin[TOTAL_PIN];
     // Inbit clk;
-    // Inbit *input;
-    // Outbit *output;
-    // int state;
 };
 
 struct Pipe
@@ -98,7 +93,6 @@ void setNot(void *pin, void *state);
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 
 void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);
-void registerEvent(Module *module, unsigned long long expiredPeriod);
 
 int determineNumOfInputPin(int inputType);
 int determineNumOfOutputPin(int inputType);
