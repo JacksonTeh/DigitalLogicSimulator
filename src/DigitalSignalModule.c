@@ -99,9 +99,10 @@ void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay)
 {
     ModuleAndPin *AND = (ModuleAndPin *)moduleAndPin;
     // Pin *ANDpin = (Pin *)pin;
+    printf("!AND: %p\n", AND);
 
     AND->pin->state = state;
-    registerEvent(AND, NULL, inputDelay);
+    // registerEvent(AND, NULL, inputDelay);
 }
 
 /**

@@ -420,12 +420,13 @@ void test_setAnd_given_AND_should_set_input_of_AND_module(void)
     moduleAndPin.module = AND;
     moduleAndPin.pin = &AND->pin[0];
 
-    registerEvent_Expect(&moduleAndPin, NULL, ONE_NANO_SEC);
+    printf("moduleAndPin: %p\n", &moduleAndPin);
+    // registerEvent_Expect(&moduleAndPin, NULL, ONE_NANO_SEC);
 
     // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
     AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
 
-    TEST_ASSERT_EQUAL(1, (AND->pin[0]).state);
+    TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
 
     destroyModule(AND);
 }
