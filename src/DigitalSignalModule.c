@@ -100,6 +100,8 @@ void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay)
     ModuleAndPin *AND = (ModuleAndPin *)moduleAndPin;
     // Pin *ANDpin = (Pin *)pin;
     // printf("!AND: %p\n", AND);
+    if(AND->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
 
     AND->pin->state = state;
     registerEvent(AND, NULL, inputDelay);
@@ -295,6 +297,13 @@ void setPipe(void *pipe, void *node, int state, unsigned long long inputDelay)
     ModuleAndPin *moduleAndPin = (ModuleAndPin *)data->dataPtr;
 
     pipeWithData->stateToFire = state;
+
+    if(data->left != NULL)
+        pipeWithData->set((void *)pipeWithData, (void *)data->left, HIGH, ONE_NANO_SEC);
+
+    if(data->right != NULL)
+        pipeWithData->set((void *)pipeWithData, (void *)data->right, HIGH, ONE_NANO_SEC);
+
     registerEvent(moduleAndPin, pipeWithData, inputDelay);
 }
 
@@ -315,7 +324,7 @@ void destroyPipe(Pipe *pipe)
         free(pipe);
     }
 }
-/* 
+/*
 void destroyNodeDataPtr(Node *node)
 {
     if(node != NULL)

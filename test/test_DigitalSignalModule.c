@@ -415,7 +415,7 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     destroyModule(OR);
 }
 
-void xtest_setAnd_given_AND_should_set_input_of_AND_module_and_register_event(void)
+void test_setAnd_given_AND_module_should_set_input_of_AND_module_and_register_event(void)
 {
     Module *AND;
     ModuleAndPin moduleAndPin;
@@ -434,6 +434,28 @@ void xtest_setAnd_given_AND_should_set_input_of_AND_module_and_register_event(vo
     AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
 
     TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
+
+    // destroyModuleAndPin(moduleAndPin);
+    destroyModule(AND);
+}
+
+void test_setAnd_given_AND_module_and_set_output_of_AND_module_should_throw_ERR_NOT_IN_PIN(void)
+{
+    CEXCEPTION_T err;
+    Module *AND;
+    ModuleAndPin moduleAndPin;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[9]).pinNumber);
+
+    Try{
+        // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
+        AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
+        TEST_FAIL_MESSAGE("Should generate an exception due to ERR_NOT_IN_PIN.");
+    } Catch(err) {
+        TEST_ASSERT_EQUAL_MESSAGE(ERR_NOT_IN_PIN, err, "Expected ERR_NOT_IN_PIN exception");
+    }
 
     // destroyModuleAndPin(moduleAndPin);
     destroyModule(AND);
@@ -462,17 +484,17 @@ void xtest_andEvent_given_AND_should_set_the_pipe(void)
     destroyModule(AND);
 }
 
-void xtest_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe(void)
+void test_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe_data(void)
 {
     Module *AND;
-    ModuleAndPin *pipeData;
+    ModuleAndPin pipeData;
     Pipe *pipe;
     Node newNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
-    // pipeData = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
+    storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
     // pipeData.module = AND;
     // pipeData.pin = &AND->pin[0];
 
@@ -480,7 +502,7 @@ void xtest_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pip
     setNode(&newNode, NULL, NULL, 'r');
     pipe->data = &newNode;
 
-    // registerEvent_Expect(&pipeData, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&pipeData, pipe, ONE_NANO_SEC);
 
     // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
     pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
@@ -488,5 +510,81 @@ void xtest_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pip
     TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
 
     destroyModule(AND);
+    destroyPipe(pipe);
+}
+
+void test_setPipe_given_pipe_with_AND_and_OR_module_data_should_register_event_for_all_pipe_data(void)
+{
+    Module *AND, *OR;
+    ModuleAndPin andData, orData;
+    Pipe *pipe;
+    Node andRootNode, orNode;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    OR = createdAndModule(inputType);
+    pipe = createdPipeModule();
+    storedModuleAndPin(&andData, AND, (AND->pin[0]).pinNumber);
+    storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
+    // pipeData.module = AND;
+    // pipeData.pin = &AND->pin[0];
+
+    genericResetNode(&andRootNode, (void *)&andData);
+    genericResetNode(&orNode, (void *)&orData);
+    setNode(&orNode, NULL, NULL, 'r');
+    setNode(&andRootNode, &orNode, NULL, 'b');
+    pipe->data = &andRootNode;
+
+    registerEvent_Expect(&orData, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&andData, pipe, ONE_NANO_SEC);
+
+    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
+    pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
+
+    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+
+    destroyModule(OR);
+    destroyModule(AND);
+    destroyPipe(pipe);
+}
+
+void test_setPipe_given_pipe_with_3_module_data_should_register_event_for_all_pipe_data(void)
+{
+    Module *AND1, *AND2, *OR;
+    ModuleAndPin andData1, andData2, orData;
+    Pipe *pipe;
+    Node and1RootNode, and2Node, orNode;
+    int inputType = QUAD_2_INPUT;
+
+    AND1 = createdAndModule(inputType);
+    AND2 = createdAndModule(inputType);
+    OR = createdAndModule(inputType);
+    pipe = createdPipeModule();
+    storedModuleAndPin(&andData1, AND1, (AND1->pin[0]).pinNumber);
+    storedModuleAndPin(&andData2, AND2, (AND2->pin[0]).pinNumber);
+    storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
+    // pipeData.module = AND;
+    // pipeData.pin = &AND->pin[0];
+
+    genericResetNode(&and1RootNode, (void *)&andData1);
+    genericResetNode(&and2Node, (void *)&andData2);
+    genericResetNode(&orNode, (void *)&orData);
+    setNode(&orNode, NULL, NULL, 'r');
+    setNode(&and2Node, NULL, NULL, 'r');
+    setNode(&and1RootNode, &orNode, &and2Node, 'b');
+    pipe->data = &and1RootNode;
+
+    registerEvent_Expect(&orData, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&andData2, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&andData1, pipe, ONE_NANO_SEC);
+
+    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
+    pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
+
+    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+
+    destroyModule(OR);
+    destroyModule(AND2);
+    destroyModule(AND1);
     destroyPipe(pipe);
 }
