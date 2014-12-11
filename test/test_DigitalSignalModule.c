@@ -162,20 +162,21 @@ void test_createdAndModule_given_DUAL_4_INPUT_type_should_create_module_for_AND_
     destroyModule(AND);
 }
 
-void test_createdModuleAndPin_should_store_module_and_pin(void)
+void test_storedModuleAndPin_should_store_module_and_pin(void)
 {
-    ModuleAndPin *moduleAndPin;
+    ModuleAndPin moduleAndPin;
     Module *AND;
-    int i, inputType = DUAL_4_INPUT, andInPin = 1;
+    int inputType = DUAL_4_INPUT, andInPin = 1;
 
     AND = createdAndModule(inputType);
-    moduleAndPin = createdModuleAndPin(AND, andInPin);
+    storedModuleAndPin(&moduleAndPin, AND, andInPin);
+    // moduleAndPin = storedModuleAndPin(AND, andInPin);
 
-    TEST_ASSERT_EQUAL_PTR(AND, moduleAndPin->module);
-    TEST_ASSERT_EQUAL_PTR(&AND->pin[andInPin], moduleAndPin->pin);
+    TEST_ASSERT_EQUAL_PTR(AND, moduleAndPin.module);
+    TEST_ASSERT_EQUAL_PTR(&AND->pin[andInPin], moduleAndPin.pin);
 
     destroyModule(AND);
-    destroyModuleAndPin(moduleAndPin);
+    // destroyModuleAndPin(moduleAndPin);
 }
 
 void test_createdPipeModule_should_create_module_for_pipe(void)
@@ -383,16 +384,17 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     Module *AND, *OR;
     Pipe *pipe;
     // ModuleAndPin pipeData = {AND, &AND->pin[0]};
-    ModuleAndPin *pipeData;
+    ModuleAndPin pipeData;
     Node newNode;
     int inputType = QUAD_2_INPUT;
 
     OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
-    pipeData = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
+    storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
+    // pipeData = storedModuleAndPin(AND, (AND->pin[0]).pinNumber);
 
-    genericResetNode(&newNode, (void *)pipeData);
+    genericResetNode(&newNode, (void *)&pipeData);
     setNode(&newNode, NULL, NULL, 'r');
 
     (OR->pin[9]).pipe = pipe;
@@ -408,19 +410,19 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     // TEST_ASSERT_EQUAL(((OR->pin[9]).pipe)->stateToFire, (AND->pin[0]).state);
     TEST_ASSERT_EQUAL_PTR((OR->pin[9]).pipe, (AND->pin[0]).pipe);
 
-    destroyModuleAndPin(pipeData);
+    // destroyModuleAndPin(pipeData);
     destroyModule(AND);
     destroyModule(OR);
 }
 
-void test_setAnd_given_AND_should_set_input_of_AND_module(void)
+void xtest_setAnd_given_AND_should_set_input_of_AND_module_and_register_event(void)
 {
     Module *AND;
     ModuleAndPin *moduleAndPin;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
-    moduleAndPin = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
+    // moduleAndPin = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
     // moduleAndPin.module = AND;
     // moduleAndPin.pin = &AND->pin[0];
 
@@ -432,7 +434,7 @@ void test_setAnd_given_AND_should_set_input_of_AND_module(void)
 
     TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
 
-    destroyModuleAndPin(moduleAndPin);
+    // destroyModuleAndPin(moduleAndPin);
     destroyModule(AND);
 }
 
@@ -459,24 +461,25 @@ void xtest_andEvent_given_AND_should_set_the_pipe(void)
     destroyModule(AND);
 }
 
-void xtest_setPipe_given_pipe_with_AND_module_data_should_set_input_of_AND_module(void)
+void xtest_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe(void)
 {
     Module *AND;
-    ModuleAndPin pipeData;
+    ModuleAndPin *pipeData;
     Pipe *pipe;
     Node newNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
-    pipeData.module = AND;
-    pipeData.pin = &AND->pin[0];
+    // pipeData = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
+    // pipeData.module = AND;
+    // pipeData.pin = &AND->pin[0];
 
     genericResetNode(&newNode, (void *)&pipeData);
     setNode(&newNode, NULL, NULL, 'r');
     pipe->data = &newNode;
 
-    registerEvent_Expect(&pipeData, pipe, ONE_NANO_SEC);
+    // registerEvent_Expect(&pipeData, pipe, ONE_NANO_SEC);
 
     // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
     pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);

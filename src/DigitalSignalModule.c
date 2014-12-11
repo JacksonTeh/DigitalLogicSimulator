@@ -314,7 +314,7 @@ void destroyPipe(Pipe *pipe)
         free(pipe);
     }
 }
-
+/* 
 void destroyNodeDataPtr(Node *node)
 {
     if(node != NULL)
@@ -327,28 +327,29 @@ void destroyNodeDataPtr(Node *node)
             // printf("node->right: %p\n", node->right);
             destroyNodeDataPtr(node->right);
 
-        ModuleAndPin *moduleAndPin = (ModuleAndPin *)node->dataPtr;
-        destroyModuleAndPin(moduleAndPin);
+        // ModuleAndPin *moduleAndPin = (ModuleAndPin *)node->dataPtr;
+        // destroyModuleAndPin(moduleAndPin);
     }
-}
+} */
 
-ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
+// ModuleAndPin *storedModuleAndPin(Module *module, int pinNum)
+void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum)
 {
-    ModuleAndPin *moduleAndPin;
+    // ModuleAndPin *moduleAndPin;
 
-    moduleAndPin = malloc(sizeof(ModuleAndPin));
+    // moduleAndPin = malloc(sizeof(ModuleAndPin));
     moduleAndPin->module = module;
     moduleAndPin->pin = &module->pin[pinNum];
 
-    return moduleAndPin;
+    // return moduleAndPin;
 }
-
+/*
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin)
 {
     // printf("moduleAndPin: %p\n", moduleAndPin);
     if(moduleAndPin != NULL)
         free(moduleAndPin);
-}
+} */
 
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData)
 {
