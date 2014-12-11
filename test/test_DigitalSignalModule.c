@@ -461,7 +461,7 @@ void test_setAnd_given_AND_module_and_set_output_of_AND_module_should_throw_ERR_
     destroyModule(AND);
 }
 
-void xtest_andEvent_given_AND_should_set_the_pipe(void)
+void xtest_andEvent_given_AND_should_generate_event_for_AND_module(void)
 {
     Module *AND;
     ModuleAndPin moduleAndPin;
@@ -472,8 +472,7 @@ void xtest_andEvent_given_AND_should_set_the_pipe(void)
     pipe = createdPipeModule();
     (AND->pin[8]).pipe = pipe;
     (AND->pin[0]).state = HIGH;
-    moduleAndPin.module = AND;
-    moduleAndPin.pin = &AND->pin[0];
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[0]).pinNumber);
 
     AND->configure((void *)AND, (void *)&AND->pin[8], NULL, NULL, NULL);
 
@@ -484,7 +483,27 @@ void xtest_andEvent_given_AND_should_set_the_pipe(void)
     destroyModule(AND);
 }
 
-void test_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe_data(void)
+void test_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe(void)
+{
+    Module *AND;
+    Pipe *pipe;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    pipe = createdPipeModule();
+
+    registerEvent_Expect(NULL, pipe, ONE_NANO_SEC);
+
+    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
+    pipe->set((void *)pipe, HIGH, ONE_NANO_SEC);
+
+    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+
+    destroyModule(AND);
+    destroyPipe(pipe);
+}
+
+void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pipe_data(void)
 {
     Module *AND;
     ModuleAndPin pipeData;
@@ -494,6 +513,7 @@ void test_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe
 
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
+    pipe->stateToFire = HIGH;
     storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
     // pipeData.module = AND;
     // pipeData.pin = &AND->pin[0];
@@ -502,18 +522,17 @@ void test_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe
     setNode(&newNode, NULL, NULL, 'r');
     pipe->data = &newNode;
 
-    registerEvent_Expect(&pipeData, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&pipeData, NULL, ONE_NANO_SEC);
 
-    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
-    pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
+    pipe->event((void *)pipe, (void *)pipe->data, ONE_NANO_SEC);
 
-    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+    TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
 
     destroyModule(AND);
     destroyPipe(pipe);
 }
 
-void test_setPipe_given_pipe_with_AND_and_OR_module_data_should_register_event_for_all_pipe_data(void)
+void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event_for_all_pipe_data(void)
 {
     Module *AND, *OR;
     ModuleAndPin andData, orData;
@@ -524,6 +543,7 @@ void test_setPipe_given_pipe_with_AND_and_OR_module_data_should_register_event_f
     AND = createdAndModule(inputType);
     OR = createdAndModule(inputType);
     pipe = createdPipeModule();
+    pipe->stateToFire = HIGH;
     storedModuleAndPin(&andData, AND, (AND->pin[0]).pinNumber);
     storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
     // pipeData.module = AND;
@@ -535,20 +555,20 @@ void test_setPipe_given_pipe_with_AND_and_OR_module_data_should_register_event_f
     setNode(&andRootNode, &orNode, NULL, 'b');
     pipe->data = &andRootNode;
 
-    registerEvent_Expect(&orData, pipe, ONE_NANO_SEC);
-    registerEvent_Expect(&andData, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&orData, NULL, ONE_NANO_SEC);
+    registerEvent_Expect(&andData, NULL, ONE_NANO_SEC);
 
-    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
-    pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
+    pipe->event((void *)pipe, (void *)pipe->data, ONE_NANO_SEC);
 
-    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+    TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
+    TEST_ASSERT_EQUAL(HIGH, (OR->pin[1]).state);
 
     destroyModule(OR);
     destroyModule(AND);
     destroyPipe(pipe);
 }
 
-void test_setPipe_given_pipe_with_3_module_data_should_register_event_for_all_pipe_data(void)
+void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_pipe_data(void)
 {
     Module *AND1, *AND2, *OR;
     ModuleAndPin andData1, andData2, orData;
@@ -560,6 +580,7 @@ void test_setPipe_given_pipe_with_3_module_data_should_register_event_for_all_pi
     AND2 = createdAndModule(inputType);
     OR = createdAndModule(inputType);
     pipe = createdPipeModule();
+    pipe->stateToFire = HIGH;
     storedModuleAndPin(&andData1, AND1, (AND1->pin[0]).pinNumber);
     storedModuleAndPin(&andData2, AND2, (AND2->pin[0]).pinNumber);
     storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
@@ -574,14 +595,15 @@ void test_setPipe_given_pipe_with_3_module_data_should_register_event_for_all_pi
     setNode(&and1RootNode, &orNode, &and2Node, 'b');
     pipe->data = &and1RootNode;
 
-    registerEvent_Expect(&orData, pipe, ONE_NANO_SEC);
-    registerEvent_Expect(&andData2, pipe, ONE_NANO_SEC);
-    registerEvent_Expect(&andData1, pipe, ONE_NANO_SEC);
+    registerEvent_Expect(&orData, NULL, ONE_NANO_SEC);
+    registerEvent_Expect(&andData2, NULL, ONE_NANO_SEC);
+    registerEvent_Expect(&andData1, NULL, ONE_NANO_SEC);
 
-    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
-    pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
+    pipe->event((void *)pipe, (void *)pipe->data, ONE_NANO_SEC);
 
-    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+    TEST_ASSERT_EQUAL(HIGH, (AND1->pin[0]).state);
+    TEST_ASSERT_EQUAL(HIGH, (AND2->pin[0]).state);
+    TEST_ASSERT_EQUAL(HIGH, (OR->pin[1]).state);
 
     destroyModule(OR);
     destroyModule(AND2);

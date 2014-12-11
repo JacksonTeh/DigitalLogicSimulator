@@ -157,12 +157,12 @@ Module *createdOrModule(int inputType)
     return OR;
 }
 
-int orEvent(void *module)
+int orEvent(void *moduleAndPin)
 {
 
 }
 
-void setOr(void *module, void *pin, int state, unsigned long long inputDelay)
+void setOr(void *moduleAndPin, int state, unsigned long long inputDelay)
 {
 
 }
@@ -285,32 +285,28 @@ Pipe *createdPipeModule()
     return pipe;
 }
 
-int pipeEvent(void *pipe)
-{
-
-}
-
-void setPipe(void *pipe, void *node, int state, unsigned long long inputDelay)
+int pipeEvent(void *pipe, void *node, unsigned long long inputDelay)
 {
     Pipe *pipeWithData = (Pipe *)pipe;
     Node *data = (Node *)node;
     ModuleAndPin *moduleAndPin = (ModuleAndPin *)data->dataPtr;
-
-    pipeWithData->stateToFire = state;
-
+    
     if(data->left != NULL)
-        pipeWithData->set((void *)pipeWithData, (void *)data->left, HIGH, ONE_NANO_SEC);
+        pipeWithData->event((void *)pipeWithData, (void *)data->left, ONE_NANO_SEC);
 
     if(data->right != NULL)
-        pipeWithData->set((void *)pipeWithData, (void *)data->right, HIGH, ONE_NANO_SEC);
+        pipeWithData->event((void *)pipeWithData, (void *)data->right, ONE_NANO_SEC);
 
-    registerEvent(moduleAndPin, pipeWithData, inputDelay);
+    moduleAndPin->module->set((void *)moduleAndPin, pipeWithData->stateToFire, inputDelay);
 }
 
-// void addPipeModuleData(Pipe **pipe, Node *newNode)
-// {
-    // genericAddRedBlackTree(&(*pipe)->data, newNode, compareModuleAndPin);
-// }
+void setPipe(void *pipe, int state, unsigned long long inputDelay)
+{
+    Pipe *pipeWithData = (Pipe *)pipe;
+
+    pipeWithData->stateToFire = state;
+    registerEvent(NULL, pipeWithData, inputDelay);
+}
 
 void destroyPipe(Pipe *pipe)
 {

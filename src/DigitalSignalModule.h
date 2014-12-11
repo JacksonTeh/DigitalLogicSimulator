@@ -55,8 +55,8 @@ struct Module
 
 struct Pipe
 {
-    int (*event)(void *object);
-    void (*set)(void *pipe, void *node, int state, unsigned long long inputDelay);
+    int (*event)(void *object, void *node, unsigned long long inputDelay);
+    void (*set)(void *pipe, int state, unsigned long long inputDelay);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
     Node *data;
     // ModuleAndPin *moduleAndPin;
@@ -64,10 +64,9 @@ struct Pipe
 };
 
 Pipe *createdPipeModule();
-int pipeEvent(void *pipe);
-void setPipe(void *pipe, void *node, int state, unsigned long long inputDelay);
+int pipeEvent(void *pipe, void *node, unsigned long long inputDelay);
+void setPipe(void *pipe, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
-// void addPipeModuleData(Pipe **pipe, Node *newNode);
 
 // void destroyNodeDataPtr(Node *node);
 
@@ -86,8 +85,8 @@ void destroyModule(Module *module);
 int andEvent(void *moduleAndPin);
 void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay);
 // void setAnd(void *module, void *pin, int state, unsigned long long inputDelay);
-int orEvent(void *module);
-void setOr(void *module, void *pin, int state, unsigned long long inputDelay);
+int orEvent(void *moduleAndPin);
+void setOr(void *moduleAndPin, int state, unsigned long long inputDelay);
 // int xorEvent(void *module);
 // void setXor(void *module, void *pin, int state, unsigned long long inputDelay);
 // int nandEvent(void *module);
