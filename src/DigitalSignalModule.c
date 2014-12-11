@@ -99,10 +99,10 @@ void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay)
 {
     ModuleAndPin *AND = (ModuleAndPin *)moduleAndPin;
     // Pin *ANDpin = (Pin *)pin;
-    printf("!AND: %p\n", AND);
+    // printf("!AND: %p\n", AND);
 
-    // AND->pin->state = state;
-    // registerEvent(AND, NULL, inputDelay);
+    AND->pin->state = state;
+    registerEvent(AND, NULL, inputDelay);
 }
 
 /**
@@ -314,18 +314,18 @@ void destroyPipe(Pipe *pipe)
         free(pipe);
     }
 }
-/*
+
 void destroyNodeDataPtr(Node *node)
 {
     if(node != NULL)
     {
         if(node->left != NULL)
-            printf("node->left: %p\n", node->left);
-            // destroyNodeDataPtr(node->left);
+            // printf("node->left: %p\n", node->left);
+            destroyNodeDataPtr(node->left);
 
         if(node->right != NULL)
-            printf("node->right: %p\n", node->right);
-            // destroyNodeDataPtr(node->right);
+            // printf("node->right: %p\n", node->right);
+            destroyNodeDataPtr(node->right);
 
         ModuleAndPin *moduleAndPin = (ModuleAndPin *)node->dataPtr;
         destroyModuleAndPin(moduleAndPin);
@@ -348,7 +348,7 @@ void destroyModuleAndPin(ModuleAndPin *moduleAndPin)
     // printf("moduleAndPin: %p\n", moduleAndPin);
     if(moduleAndPin != NULL)
         free(moduleAndPin);
-} */
+}
 
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData)
 {

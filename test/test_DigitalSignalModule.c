@@ -161,7 +161,7 @@ void test_createdAndModule_given_DUAL_4_INPUT_type_should_create_module_for_AND_
 
     destroyModule(AND);
 }
-/*
+
 void test_createdModuleAndPin_should_store_module_and_pin(void)
 {
     ModuleAndPin *moduleAndPin;
@@ -176,7 +176,7 @@ void test_createdModuleAndPin_should_store_module_and_pin(void)
 
     destroyModule(AND);
     destroyModuleAndPin(moduleAndPin);
-} */
+}
 
 void test_createdPipeModule_should_create_module_for_pipe(void)
 {
@@ -382,15 +382,17 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
 {
     Module *AND, *OR;
     Pipe *pipe;
-    ModuleAndPin pipeData = {AND, &AND->pin[0]};
+    // ModuleAndPin pipeData = {AND, &AND->pin[0]};
+    ModuleAndPin *pipeData;
     Node newNode;
     int inputType = QUAD_2_INPUT;
 
     OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
+    pipeData = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
 
-    genericResetNode(&newNode, (void *)&pipeData);
+    genericResetNode(&newNode, (void *)pipeData);
     setNode(&newNode, NULL, NULL, 'r');
 
     (OR->pin[9]).pipe = pipe;
@@ -406,6 +408,7 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     // TEST_ASSERT_EQUAL(((OR->pin[9]).pipe)->stateToFire, (AND->pin[0]).state);
     TEST_ASSERT_EQUAL_PTR((OR->pin[9]).pipe, (AND->pin[0]).pipe);
 
+    destroyModuleAndPin(pipeData);
     destroyModule(AND);
     destroyModule(OR);
 }
@@ -413,22 +416,24 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
 void test_setAnd_given_AND_should_set_input_of_AND_module(void)
 {
     Module *AND;
-    ModuleAndPin moduleAndPin;
+    ModuleAndPin *moduleAndPin;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
-    moduleAndPin.module = AND;
-    moduleAndPin.pin = &AND->pin[0];
+    moduleAndPin = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
+    // moduleAndPin.module = AND;
+    // moduleAndPin.pin = &AND->pin[0];
 
-    printf("moduleAndPin: %p\n", &moduleAndPin);
-    // registerEvent_Expect(&moduleAndPin, NULL, ONE_NANO_SEC);
+    // printf("moduleAndPin: %p\n", &moduleAndPin);
+    registerEvent_Expect(moduleAndPin, NULL, ONE_NANO_SEC);
 
     // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
-    AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
+    AND->set((void *)moduleAndPin, HIGH, ONE_NANO_SEC);
 
     TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
 
-    // destroyModule(AND);
+    destroyModuleAndPin(moduleAndPin);
+    destroyModule(AND);
 }
 
 void xtest_andEvent_given_AND_should_set_the_pipe(void)

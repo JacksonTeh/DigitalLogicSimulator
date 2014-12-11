@@ -71,8 +71,8 @@ void destroyPipe(Pipe *pipe);
 
 // void destroyNodeDataPtr(Node *node);
 
-// ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
-// void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
+ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
+void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
 Module *createdAndModule(int inputType);
 Module *createdOrModule(int inputType);
