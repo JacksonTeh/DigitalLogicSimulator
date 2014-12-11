@@ -391,11 +391,11 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
-    storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
+    // storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
     // pipeData = storedModuleAndPin(AND, (AND->pin[0]).pinNumber);
 
     genericResetNode(&newNode, (void *)&pipeData);
-    setNode(&newNode, NULL, NULL, 'r');
+    // setNode(&newNode, NULL, NULL, 'r');
 
     (OR->pin[9]).pipe = pipe;
 
@@ -418,19 +418,20 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
 void xtest_setAnd_given_AND_should_set_input_of_AND_module_and_register_event(void)
 {
     Module *AND;
-    ModuleAndPin *moduleAndPin;
+    ModuleAndPin moduleAndPin;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[0]).pinNumber);
     // moduleAndPin = createdModuleAndPin(AND, (&AND->pin[0])->pinNumber);
     // moduleAndPin.module = AND;
     // moduleAndPin.pin = &AND->pin[0];
 
     // printf("moduleAndPin: %p\n", &moduleAndPin);
-    registerEvent_Expect(moduleAndPin, NULL, ONE_NANO_SEC);
+    registerEvent_Expect(&moduleAndPin, NULL, ONE_NANO_SEC);
 
     // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
-    AND->set((void *)moduleAndPin, HIGH, ONE_NANO_SEC);
+    AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
 
     TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
 
