@@ -391,11 +391,11 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
-    // storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
+    storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
     // pipeData = storedModuleAndPin(AND, (AND->pin[0]).pinNumber);
 
     genericResetNode(&newNode, (void *)&pipeData);
-    // setNode(&newNode, NULL, NULL, 'r');
+    setNode(&newNode, NULL, NULL, 'r');
 
     (OR->pin[9]).pipe = pipe;
 
