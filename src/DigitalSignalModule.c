@@ -255,7 +255,8 @@ void destroyModule(Module *module)
 
         for(i = 0; i < TOTAL_PIN; i++)
         {
-            destroyPipe((module->pin[i]).pipe);
+            if((module->pin[i]).type == OUTPUT_PIN)
+                destroyPipe((module->pin[i]).pipe);
         }
 
         free(module);
