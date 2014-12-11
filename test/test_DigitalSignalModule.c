@@ -412,7 +412,7 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
 
     // destroyModuleAndPin(pipeData);
     // destroyModule(AND);
-    // destroyModule(OR);
+    destroyModule(OR);
 }
 
 void xtest_setAnd_given_AND_should_set_input_of_AND_module_and_register_event(void)
