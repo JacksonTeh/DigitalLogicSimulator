@@ -2,6 +2,7 @@
 #include "unity.h"
 #include "ErrorCode.h"
 #include "DigitalSignalModule.h"
+#include "DigitalEventSimulator.h"
 #include "RedBlackTree.h"
 #include "InitNode.h"
 #include "CustomAssertions.h"
