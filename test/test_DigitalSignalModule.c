@@ -428,7 +428,7 @@ void test_setAnd_given_AND_should_set_input_of_AND_module(void)
 
     TEST_ASSERT_EQUAL(HIGH, (AND->pin[0]).state);
 
-    destroyModule(AND);
+    // destroyModule(AND);
 }
 
 void xtest_andEvent_given_AND_should_set_the_pipe(void)
