@@ -453,7 +453,7 @@ void xtest_andEvent_given_AND_should_set_the_pipe(void)
     destroyModule(AND);
 }
 
-void test_setPipe_given_pipe_with_AND_module_data_should_set_input_of_AND_module(void)
+void xtest_setPipe_given_pipe_with_AND_module_data_should_set_input_of_AND_module(void)
 {
     Module *AND;
     ModuleAndPin pipeData;
