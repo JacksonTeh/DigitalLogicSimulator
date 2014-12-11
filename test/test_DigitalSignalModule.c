@@ -73,10 +73,12 @@ void test_createdAndModule_given_QUAD_2_INPUT_type_should_create_module_for_AND_
     AND = createdAndModule(inputType);
 
     TEST_ASSERT_NOT_NULL(AND);
+    TEST_ASSERT_EQUAL_STRING("AND", AND->name);
     TEST_ASSERT_EQUAL_PTR(&andEvent, AND->event);
     TEST_ASSERT_EQUAL_PTR(&setAnd, AND->set);
     TEST_ASSERT_EQUAL_PTR(&configureInputOutput, AND->configure);
-    TEST_ASSERT_EQUAL_PTR(TOTAL_PIN, AND->totalPin);
+    TEST_ASSERT_EQUAL(inputType, AND->typeOfInput);
+    TEST_ASSERT_EQUAL(TOTAL_PIN, AND->totalPin);
     // TEST_ASSERT_EQUAL_PTR(NULL, AND->pipe);
 
     for(i = 0; i < TOTAL_PIN; i++)
@@ -104,10 +106,12 @@ void test_createdAndModule_given_TRI_3_INPUT_type_should_create_module_for_AND_g
     AND = createdAndModule(inputType);
 
     TEST_ASSERT_NOT_NULL(AND);
+    TEST_ASSERT_EQUAL_STRING("AND", AND->name);
     TEST_ASSERT_EQUAL_PTR(&andEvent, AND->event);
     TEST_ASSERT_EQUAL_PTR(&setAnd, AND->set);
     TEST_ASSERT_EQUAL_PTR(&configureInputOutput, AND->configure);
-    TEST_ASSERT_EQUAL_PTR(TOTAL_PIN, AND->totalPin);
+    TEST_ASSERT_EQUAL(inputType, AND->typeOfInput);
+    TEST_ASSERT_EQUAL(TOTAL_PIN, AND->totalPin);
     // TEST_ASSERT_EQUAL_PTR(NULL, AND->pipe);
 
     for(i = 0; i < TOTAL_PIN; i++)
@@ -134,10 +138,12 @@ void test_createdAndModule_given_DUAL_4_INPUT_type_should_create_module_for_AND_
     AND = createdAndModule(inputType);
 
     TEST_ASSERT_NOT_NULL(AND);
+    TEST_ASSERT_EQUAL_STRING("AND", AND->name);
     TEST_ASSERT_EQUAL_PTR(&andEvent, AND->event);
     TEST_ASSERT_EQUAL_PTR(&setAnd, AND->set);
     TEST_ASSERT_EQUAL_PTR(&configureInputOutput, AND->configure);
-    TEST_ASSERT_EQUAL_PTR(TOTAL_PIN, AND->totalPin);
+    TEST_ASSERT_EQUAL(inputType, AND->typeOfInput);
+    TEST_ASSERT_EQUAL(TOTAL_PIN, AND->totalPin);
     // TEST_ASSERT_EQUAL_PTR(NULL, AND->pipe);
 
     for(i = 0; i < TOTAL_PIN; i++)
@@ -155,7 +161,7 @@ void test_createdAndModule_given_DUAL_4_INPUT_type_should_create_module_for_AND_
 
     destroyModule(AND);
 }
-
+/*
 void test_createdModuleAndPin_should_store_module_and_pin(void)
 {
     ModuleAndPin *moduleAndPin;
@@ -170,7 +176,7 @@ void test_createdModuleAndPin_should_store_module_and_pin(void)
 
     destroyModule(AND);
     destroyModuleAndPin(moduleAndPin);
-}
+} */
 
 void test_createdPipeModule_should_create_module_for_pipe(void)
 {
@@ -188,7 +194,7 @@ void test_createdPipeModule_should_create_module_for_pipe(void)
     // TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->pin);
     // TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->left);
     // TEST_ASSERT_EQUAL_PTR(NULL, pipe->moduleAndPin->right);
-    TEST_ASSERT_EQUAL_PTR(UNKNOWN, pipe->stateToFire);
+    TEST_ASSERT_EQUAL(UNKNOWN, pipe->stateToFire);
 
     destroyPipe(pipe);
 }
@@ -310,6 +316,7 @@ void test_configureInputOutput_given_invalid_output_pin_for_OR_module_should_thr
 {
     CEXCEPTION_T err;
     Module *AND, *OR;
+    // Node newNode = NULL;
 
     int inputType = QUAD_2_INPUT;
 
@@ -317,7 +324,7 @@ void test_configureInputOutput_given_invalid_output_pin_for_OR_module_should_thr
     Try{
         OR = createdOrModule(inputType);
         AND = createdAndModule(inputType);
-        OR->configure((void *)OR, (void *)&OR->pin[1], (void *)AND, (void *)&AND->pin[0]);
+        OR->configure((void *)OR, (void *)&OR->pin[1], (void *)AND, (void *)&AND->pin[0], NULL);
         TEST_FAIL_MESSAGE("Should generate an exception due to ERR_NOT_OUT_PIN.");
     } Catch(err) {
         TEST_ASSERT_EQUAL_MESSAGE(ERR_NOT_OUT_PIN, err, "Expected ERR_NOT_OUT_PIN exception");
@@ -331,6 +338,7 @@ void test_configureInputOutput_given_invalid_input_pin_for_AND_module_should_thr
 {
     CEXCEPTION_T err;
     Module *AND, *OR;
+    // Node newNode = NULL;
 
     int inputType = QUAD_2_INPUT;
 
@@ -338,7 +346,7 @@ void test_configureInputOutput_given_invalid_input_pin_for_AND_module_should_thr
     Try{
         OR = createdOrModule(inputType);
         AND = createdAndModule(inputType);
-        OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[9]);
+        OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[9], NULL);
         TEST_FAIL_MESSAGE("Should generate an exception due to ERR_NOT_IN_PIN.");
     } Catch(err) {
         TEST_ASSERT_EQUAL_MESSAGE(ERR_NOT_IN_PIN, err, "Expected ERR_NOT_IN_PIN exception");
@@ -351,13 +359,14 @@ void test_configureInputOutput_given_invalid_input_pin_for_AND_module_should_thr
 void test_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to_a_pipe_module(void)
 {
     Module *AND, *OR;
+    // Node newNode = NULL;
     int inputType = QUAD_2_INPUT;
 
     OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
 
     // printf("\ntest_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to_a_pipe_module\n");
-    OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0]);
+    OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0], NULL);
 
     TEST_ASSERT_NOT_NULL(AND);
     TEST_ASSERT_NOT_NULL(OR);
@@ -369,11 +378,11 @@ void test_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to
     destroyModule(OR);
 }
 
-void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_connect_output_from_pipe_to_AND_module(void)
+void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_connect_output_from_pipe_to_AND_module_and_add_data_to_pipe(void)
 {
     Module *AND, *OR;
     Pipe *pipe;
-    ModuleAndPin moduleAndPin = {AND, &AND->pin[0]};
+    ModuleAndPin pipeData = {AND, &AND->pin[0]};
     Node newNode;
     int inputType = QUAD_2_INPUT;
 
@@ -381,61 +390,93 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
 
-    genericResetNode(&newNode, (void *)&moduleAndPin);
+    genericResetNode(&newNode, (void *)&pipeData);
     setNode(&newNode, NULL, NULL, 'r');
 
     (OR->pin[9]).pipe = pipe;
 
-    // genericAddRedBlackTree_Expect(&((OR->pin[9]).pipe)->data, &newNode, compareModuleAndPin);
+    genericAddRedBlackTree_Expect(&((OR->pin[9]).pipe)->data, &newNode, compareModuleAndPin);
 
     // printf("\ntest_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to_a_pipe_module\n");
-    OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0]);
+    OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0], &newNode);
 
     TEST_ASSERT_NOT_NULL(AND);
     TEST_ASSERT_NOT_NULL(OR);
     TEST_ASSERT_NOT_NULL((OR->pin[9]).pipe);
-    TEST_ASSERT_EQUAL(((OR->pin[9]).pipe)->stateToFire, (AND->pin[0]).state);
+    // TEST_ASSERT_EQUAL(((OR->pin[9]).pipe)->stateToFire, (AND->pin[0]).state);
+    TEST_ASSERT_EQUAL_PTR((OR->pin[9]).pipe, (AND->pin[0]).pipe);
 
     destroyModule(AND);
     destroyModule(OR);
 }
-/*
-void xtest_configureInputOutput_given_AND_and_OR_should_connect_output_from_OR_to_AND_through_a_pipe_module(void)
+
+void test_setAnd_given_AND_should_set_input_of_AND_module(void)
 {
-    Module *AND, *OR;
-    ModuleAndPin *result;
+    Module *AND;
+    ModuleAndPin moduleAndPin;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    moduleAndPin.module = AND;
+    moduleAndPin.pin = &AND->pin[0];
+
+    registerEvent_Expect(&moduleAndPin, NULL, ONE_NANO_SEC);
+
+    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
+    AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
+
+    TEST_ASSERT_EQUAL(1, (AND->pin[0]).state);
+
+    destroyModule(AND);
+}
+
+void xtest_andEvent_given_AND_should_set_the_pipe(void)
+{
+    Module *AND;
+    ModuleAndPin moduleAndPin;
     Pipe *pipe;
     int inputType = QUAD_2_INPUT;
 
-    OR = createdOrModule(inputType);
     AND = createdAndModule(inputType);
+    pipe = createdPipeModule();
+    (AND->pin[8]).pipe = pipe;
+    (AND->pin[0]).state = HIGH;
+    moduleAndPin.module = AND;
+    moduleAndPin.pin = &AND->pin[0];
 
-    OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0]);
+    AND->configure((void *)AND, (void *)&AND->pin[8], NULL, NULL, NULL);
 
-    pipe = (OR->pin[9]).pipe;
-    result = (ModuleAndPin *)pipe->data->dataPtr;
-    // printf("((OR->pin[9]).pipe)->data: %p\n", ((OR->pin[9]).pipe)->data);
-    printf("\n&((OR->pin[9]).pipe)->data->left: %p\n", &((OR->pin[9]).pipe)->data->left);
-    printf("&((OR->pin[9]).pipe)->data->right: %p\n", &((OR->pin[9]).pipe)->data->right);
-    printf("((OR->pin[9]).pipe)->data->left: %p\n", *(((OR->pin[9]).pipe)->data->left));
-    printf("((OR->pin[9]).pipe)->data->right: %p\n", ((OR->pin[9]).pipe)->data->right);
-    printf("\npipe->data: %p\n", pipe->data);
-    printf("&pipe->data->left: %p\n", &pipe->data->left);
-    printf("&pipe->data->right: %p\n", &pipe->data->right);
-    printf("pipe->data->left: %p\n", *(pipe->data->left));
-    printf("pipe->data->right: %p\n\n", pipe->data->right);
+    // registerEvent_Expect(NULL, ONE_NANO_SEC);
 
-    TEST_ASSERT_NOT_NULL(AND);
-    TEST_ASSERT_NOT_NULL(OR);
-    TEST_ASSERT_NOT_NULL(pipe);
-    // TEST_ASSERT_NULL(&((OR->pin[9]).pipe)->data->left);
-    // TEST_ASSERT_NULL(pipe->data->left);
-    // TEST_ASSERT_NULL(pipe->data->right);
-    TEST_ASSERT_EQUAL_PTR(AND, result->module);
-    TEST_ASSERT_EQUAL_PTR(&AND->pin[0], result->pin);
-    // TEST_ASSERT_NOT_NULL((OR->pin[orPinNum-1]).pipe);
-    // TEST_ASSERT_EQUAL(AND, (OR->pin[orOutPin-1]).pipe)->moduleAndPin->module);
+    // AND->event((void *)moduleAndPin);
 
     destroyModule(AND);
-    destroyModule(OR);
-} */
+}
+
+void test_setPipe_given_pipe_with_AND_module_data_should_set_input_of_AND_module(void)
+{
+    Module *AND;
+    ModuleAndPin pipeData;
+    Pipe *pipe;
+    Node newNode;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    pipe = createdPipeModule();
+    pipeData.module = AND;
+    pipeData.pin = &AND->pin[0];
+
+    genericResetNode(&newNode, (void *)&pipeData);
+    setNode(&newNode, NULL, NULL, 'r');
+    pipe->data = &newNode;
+
+    registerEvent_Expect(&pipeData, pipe, ONE_NANO_SEC);
+
+    // AND->set((void *)AND, (void *)&AND->pin[0], HIGH, ONE_NANO_SEC);
+    pipe->set((void *)pipe, (void *)pipe->data, HIGH, ONE_NANO_SEC);
+
+    TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
+
+    destroyModule(AND);
+    destroyPipe(pipe);
+}

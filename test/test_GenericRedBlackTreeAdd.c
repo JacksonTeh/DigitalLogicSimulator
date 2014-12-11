@@ -8,11 +8,6 @@
 #include "Rotations.h"
 #include "CException.h"
 
-// #define TIME_1ns 0.0000000001
-// #define TIME_2ns 500000000
-// #define TIME_4ns 250000000
-
-
 Node nodeA, nodeB, nodeC, nodeD;
 ModuleAndPin moduleAndPin[4];   //dataPtr
 
@@ -28,9 +23,9 @@ void setUp(void)
     genericResetNode(&nodeC, (void *)&moduleAndPin[2]);
     genericResetNode(&nodeD, (void *)&moduleAndPin[3]);
 
-    setEventTime(&time_1ns, 1);
-    setEventTime(&time_2ns, 2);
-    setEventTime(&time_4ns, 4);
+    setEventTime(&time_1ns, ONE_NANO_SEC);
+    setEventTime(&time_2ns, 2 * ONE_NANO_SEC);
+    setEventTime(&time_4ns, 4 * ONE_NANO_SEC);
     genericResetNode(&node1, (void *)&time_1ns);
     genericResetNode(&node2, (void *)&time_2ns);
     genericResetNode(&node4, (void *)&time_4ns);

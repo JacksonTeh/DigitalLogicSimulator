@@ -1,5 +1,7 @@
 #include "unity.h"
 #include "DigitalEventSimulator.h"
+#include "mock_DigitalSignalModule.h"
+#include "mock_RedBlackTree.h"
 
 void setUp(void)
 {
@@ -9,7 +11,7 @@ void tearDown(void)
 {
 }
 
-void test_module_generator_needs_to_be_implemented(void)
+void xtest_registerEvent(void)
 {
-	TEST_IGNORE_MESSAGE("Implement me!");
+	
 }

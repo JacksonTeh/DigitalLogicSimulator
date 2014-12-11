@@ -4,6 +4,8 @@
 #include "Node.h"
 
 #define TOTAL_PIN       14
+#define ONE_PICO_SEC    1
+#define ONE_NANO_SEC    1000 * ONE_PICO_SEC
 
 typedef enum {QUAD_2_INPUT, TRI_3_INPUT, DUAL_4_INPUT, HEX_INV} InputType;
 typedef enum {LOW, HIGH, UNKNOWN} State;
@@ -39,11 +41,14 @@ struct Pin
 
 struct Module
 {
-    int (*event)(void *object);
-    void (*set)(void *pin, void *state);
-    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
+    char *name;
+    int (*event)(void *moduleAndPin);
+    // int (*event)(void *object, void *pin);
+    void (*set)(void *moduleAndPin, int state, unsigned long long inputDelay);
+    // void (*set)(void *module, void *pin, int state, unsigned long long inputDelay);
+    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
+    int typeOfInput;
     int totalPin;
-    Pipe *pipe;
     Pin pin[TOTAL_PIN];
     // Inbit clk;
 };
@@ -51,23 +56,23 @@ struct Module
 struct Pipe
 {
     int (*event)(void *object);
-    void (*set)(void *pin, void *state);
-    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
+    void (*set)(void *pipe, void *node, int state, unsigned long long inputDelay);
+    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
     Node *data;
     // ModuleAndPin *moduleAndPin;
     int stateToFire;
 };
 
 Pipe *createdPipeModule();
-int pipeEvent(void *module);
-void setPipe(void *pin, void *state);
+int pipeEvent(void *pipe);
+void setPipe(void *pipe, void *node, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
-void addPipeModuleData(Pipe **pipe, Node *newNode);
+// void addPipeModuleData(Pipe **pipe, Node *newNode);
 
-void destroyNodeDataPtr(Node *node);
+// void destroyNodeDataPtr(Node *node);
 
-ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
-void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
+// ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
+// void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
 Module *createdAndModule(int inputType);
 Module *createdOrModule(int inputType);
@@ -77,22 +82,23 @@ Module *createdNorModule(int numberOfPin);
 Module *createdNotModule(int numberOfPin);
 void destroyModule(Module *module);
 
-int andEvent(void *module);
-void setAnd(void *pin, void *state);
+int andEvent(void *moduleAndPin);
+void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay);
+// void setAnd(void *module, void *pin, int state, unsigned long long inputDelay);
 int orEvent(void *module);
-void setOr(void *pin, void *state);
-int xorEvent(void *module);
-void setXor(void *pin, void *state);
-int nandEvent(void *module);
-void setNand(void *pin, void *state);
-int norEvent(void *module);
-void setNor(void *pin, void *state);
-int notEvent(void *module);
-void setNot(void *pin, void *state);
+void setOr(void *module, void *pin, int state, unsigned long long inputDelay);
+// int xorEvent(void *module);
+// void setXor(void *module, void *pin, int state, unsigned long long inputDelay);
+// int nandEvent(void *module);
+// void setNand(void *module, void *pin, int state, unsigned long long inputDelay);
+// int norEvent(void *module);
+// void setNor(void *module, void *pin, int state, unsigned long long inputDelay);
+// int notEvent(void *module);
+// void setNot(void *module, void *pin, int state, unsigned long long inputDelay);
 // Module *configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
-void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
+void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
 
-void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);
+// void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);
 
 int determineNumOfInputPin(int inputType);
 int determineNumOfOutputPin(int inputType);
