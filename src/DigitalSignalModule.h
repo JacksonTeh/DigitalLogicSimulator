@@ -18,6 +18,7 @@ typedef struct Module Module;
 typedef struct Pipe Pipe;
 typedef struct ModuleAndPin ModuleAndPin;
 typedef struct Pin Pin;
+typedef struct Switch Switch;
 
 struct ModuleAndPin
 {
@@ -39,10 +40,17 @@ struct Pin
     PinType type;
 };
 
+struct Switch
+{
+    void (*event)(void *moduleAndPin);
+    void (*set)(void *moduleAndPin, int state, unsigned long long inputDelay);
+    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
+};
+
 struct Module
 {
     char *name;
-    int (*event)(void *moduleAndPin);
+    void (*event)(void *moduleAndPin);
     // int (*event)(void *object, void *pin);
     void (*set)(void *moduleAndPin, int state, unsigned long long inputDelay);
     // void (*set)(void *module, void *pin, int state, unsigned long long inputDelay);
@@ -55,7 +63,7 @@ struct Module
 
 struct Pipe
 {
-    int (*event)(void *object, void *node, unsigned long long inputDelay);
+    void (*event)(void *object, void *node, unsigned long long inputDelay);
     void (*set)(void *pipe, int state, unsigned long long inputDelay);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
     Node *data;
@@ -64,7 +72,7 @@ struct Pipe
 };
 
 Pipe *createdPipeModule();
-int pipeEvent(void *pipe, void *node, unsigned long long inputDelay);
+void pipeEvent(void *pipe, void *node, unsigned long long inputDelay);
 void setPipe(void *pipe, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
 
@@ -82,10 +90,14 @@ Module *createdNorModule(int numberOfPin);
 Module *createdNotModule(int numberOfPin);
 void destroyModule(Module *module);
 
-int andEvent(void *moduleAndPin);
+void andEvent(void *moduleAndPin);
 void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay);
+int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
+int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
+int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
+int funcOfAND(Module *module, int pinNumber, int inputType);
 // void setAnd(void *module, void *pin, int state, unsigned long long inputDelay);
-int orEvent(void *moduleAndPin);
+void orEvent(void *moduleAndPin);
 void setOr(void *moduleAndPin, int state, unsigned long long inputDelay);
 // int xorEvent(void *module);
 // void setXor(void *module, void *pin, int state, unsigned long long inputDelay);

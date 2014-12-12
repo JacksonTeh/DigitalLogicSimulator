@@ -91,6 +91,7 @@ void test_createdAndModule_given_QUAD_2_INPUT_type_should_create_module_for_AND_
             TEST_ASSERT_EQUAL(UNUSED_PIN, (AND->pin[i]).type);
 
         TEST_ASSERT_EQUAL(i, (AND->pin[i]).pinNumber);
+        TEST_ASSERT_EQUAL(LOW, (AND->pin[i]).state);
         // TEST_ASSERT_EQUAL_PTR(NULL, (AND->pin[i]).moduleConnected);
         TEST_ASSERT_EQUAL_PTR(NULL, (AND->pin[i]).pipe);
     }
@@ -124,6 +125,7 @@ void test_createdAndModule_given_TRI_3_INPUT_type_should_create_module_for_AND_g
             TEST_ASSERT_EQUAL(UNUSED_PIN, (AND->pin[i]).type);
 
         TEST_ASSERT_EQUAL(i, (AND->pin[i]).pinNumber);
+        TEST_ASSERT_EQUAL(LOW, (AND->pin[i]).state);
         TEST_ASSERT_EQUAL_PTR(NULL, (AND->pin[i]).pipe);
     }
 
@@ -156,6 +158,7 @@ void test_createdAndModule_given_DUAL_4_INPUT_type_should_create_module_for_AND_
             TEST_ASSERT_EQUAL(UNUSED_PIN, (AND->pin[i]).type);
 
         TEST_ASSERT_EQUAL(i, (AND->pin[i]).pinNumber);
+        TEST_ASSERT_EQUAL(LOW, (AND->pin[i]).state);
         TEST_ASSERT_EQUAL_PTR(NULL, (AND->pin[i]).pipe);
     }
 
@@ -199,83 +202,6 @@ void test_createdPipeModule_should_create_module_for_pipe(void)
 
     destroyPipe(pipe);
 }
-/*
-void test_addPipeModuleData_should_add_AND_module_and_pin_to_the_pipe_module_data(void)
-{
-    Pipe *pipe;
-    Module *AND;
-    ModuleAndPin *moduleAND;
-    Node newNode;
-    int inputType = QUAD_2_INPUT, pinNum = 1;
-
-    // printf("\ntest_addPipeModuleData_should_add_AND_module_and_pin_to_the_pipe_module_data\n");
-    AND = createdAndModule(inputType);
-    pipe = createdPipeModule();
-    // pipe->moduleAndPin->module = AND;
-    // pipe->moduleAndPin->pin = &AND->pin[0];
-    moduleAND = createdModuleAndPin(AND, pinNum);
-
-    genericResetNode(&newNode, (void *)moduleAND);
-
-    addPipeModuleData(&pipe, &newNode);
-
-    TEST_ASSERT_NOT_NULL(pipe);
-    TEST_ASSERT_EQUAL_PTR(&pipeEvent, pipe->event);
-    TEST_ASSERT_EQUAL_PTR(&setPipe, pipe->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, pipe->configure);
-    TEST_ASSERT_EQUAL_PTR(&newNode, pipe->data);
-    TEST_ASSERT_EQUAL_PTR((void *)moduleAND, pipe->data->dataPtr);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->data->left);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->data->right);
-    TEST_ASSERT_EQUAL_PTR(UNKNOWN, pipe->stateToFire);
-
-    // destroyModuleAndPin(moduleAND);
-    destroyModule(AND);
-    destroyPipe(pipe);
-}
-
-void test_addPipeModuleData_given_AND_module_and_pin_in_pipe_module_data_should_add_OR_module_and_pin_to_the_pipe_module_data(void)
-{
-    Pipe *pipe;
-    Module *AND, *OR;
-    ModuleAndPin *moduleAND, *moduleOR;
-    Node root, newNode;
-    int inputType = QUAD_2_INPUT, pinNum = 1;
-
-    // printf("\ntest_addPipeModuleData_given_AND_module_and_pin_in_pipe_module_data_should_add_OR_module_and_pin_to_the_pipe_module_data\n");
-    AND = createdAndModule(inputType);
-    OR = createdOrModule(inputType);
-    pipe = createdPipeModule();
-    // pipe->moduleAndPin->module = AND;
-    // pipe->moduleAndPin->pin = &AND->pin[0];
-    moduleAND = createdModuleAndPin(AND, pinNum);
-    moduleOR = createdModuleAndPin(OR, pinNum);
-
-    genericResetNode(&root, (void *)moduleAND);
-    genericResetNode(&newNode, (void *)moduleOR);
-    setNode(&newNode, NULL, NULL, 'r');
-    setNode(&root, NULL, NULL, 'b');
-    pipe->data = &root;
-
-    addPipeModuleData(&pipe, &newNode);
-
-    TEST_ASSERT_NOT_NULL(pipe);
-    TEST_ASSERT_EQUAL_PTR(&pipeEvent, pipe->event);
-    TEST_ASSERT_EQUAL_PTR(&setPipe, pipe->set);
-    TEST_ASSERT_EQUAL_PTR(&configureInputOutput, pipe->configure);
-    TEST_ASSERT_EQUAL_PTR((void *)moduleAND, pipe->data->dataPtr);
-    TEST_ASSERT_EQUAL_PTR((void *)moduleOR, pipe->data->right->dataPtr);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->data->right->left);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->data->right->right);
-    TEST_ASSERT_EQUAL_PTR(NULL, pipe->data->left);
-    TEST_ASSERT_EQUAL_PTR(UNKNOWN, pipe->stateToFire);
-
-    // destroyModuleAndPin(moduleAND);
-    // destroyModuleAndPin(moduleOR);
-    destroyModule(AND);
-    destroyModule(OR);
-    destroyPipe(pipe);
-} */
 /*
 void test_pipeAttach_given_module_AND_in_pipe_module_data_should_attach_pipe_module_to_AND_module(void)
 {
@@ -438,7 +364,7 @@ void test_setAnd_given_AND_module_should_set_input_of_AND_module_and_register_ev
     // destroyModuleAndPin(moduleAndPin);
     destroyModule(AND);
 }
-
+ 
 void test_setAnd_given_AND_module_and_set_output_of_AND_module_should_throw_ERR_NOT_IN_PIN(void)
 {
     CEXCEPTION_T err;
@@ -461,24 +387,176 @@ void test_setAnd_given_AND_module_and_set_output_of_AND_module_should_throw_ERR_
     destroyModule(AND);
 }
 
-void xtest_andEvent_given_AND_should_generate_event_for_AND_module(void)
+void test_andEvent_given_AND_with_QUAD_2_INPUT_should_generate_event_for_AND_module(void)
 {
-    Module *AND;
+    Module *AND, *module;
+    ModuleAndPin moduleAndPin;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[6]).state = HIGH;
+    (AND->pin[7]).state = HIGH;
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[6]).pinNumber);
+
+    AND->event((void *)&moduleAndPin);
+    module = moduleAndPin.module;
+
+    TEST_ASSERT_EQUAL(HIGH, (module->pin[11]).state);
+
+    destroyModule(AND);
+}
+
+void test_andEvent_given_AND_with_TRI_3_INPUT_should_generate_event_for_AND_module(void)
+{
+    Module *AND, *module;
+    ModuleAndPin moduleAndPin;
+    int inputType = TRI_3_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[3]).state = HIGH;
+    (AND->pin[4]).state = HIGH;
+    (AND->pin[5]).state = HIGH;
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[4]).pinNumber);
+
+    AND->event((void *)&moduleAndPin);
+    module = moduleAndPin.module;
+
+    TEST_ASSERT_EQUAL(HIGH, (module->pin[10]).state);
+
+    destroyModule(AND);
+}
+
+void test_andEvent_given_AND_with_DUAL_4_INPUT_should_generate_event_for_AND_module(void)
+{
+    Module *AND, *module;
+    ModuleAndPin moduleAndPin;
+    int inputType = DUAL_4_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[4]).state = HIGH;
+    (AND->pin[5]).state = HIGH;
+    (AND->pin[6]).state = HIGH;
+    (AND->pin[7]).state = HIGH;
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[5]).pinNumber);
+
+    AND->event((void *)&moduleAndPin);
+    module = moduleAndPin.module;
+
+    TEST_ASSERT_EQUAL(HIGH, (module->pin[9]).state);
+
+    destroyModule(AND);
+}
+
+void test_andEvent_given_AND_with_QUAD_2_INPUT_and_connected_to_pipe_should_register_event_for_pipe(void)
+{
+    Module *AND, *module;
     ModuleAndPin moduleAndPin;
     Pipe *pipe;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
+    (AND->pin[6]).state = HIGH;
+    (AND->pin[7]).state = HIGH;
     pipe = createdPipeModule();
-    (AND->pin[8]).pipe = pipe;
+    AND->pin[11].pipe = pipe;
+    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[6]).pinNumber);
+
+    registerEvent_Expect(NULL, pipe, ONE_NANO_SEC);
+
+    AND->event((void *)&moduleAndPin);
+    module = moduleAndPin.module;
+
+    TEST_ASSERT_EQUAL(HIGH, (module->pin[11]).state);
+
+    destroyModule(AND);
+}
+
+void test_funcOfAND_given_QUAD_2_INPUT_AND_and_HIGH_in_both_input_should_return_HIGH(void)
+{
+    Module *AND;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
     (AND->pin[0]).state = HIGH;
-    storedModuleAndPin(&moduleAndPin, AND, (AND->pin[0]).pinNumber);
+    (AND->pin[1]).state = HIGH;
 
-    AND->configure((void *)AND, (void *)&AND->pin[8], NULL, NULL, NULL);
+    TEST_ASSERT_EQUAL(HIGH, funcOfAND(AND, AND->pin[0].pinNumber, inputType));
 
-    // registerEvent_Expect(NULL, ONE_NANO_SEC);
+    destroyModule(AND);
+}
 
-    // AND->event((void *)moduleAndPin);
+void test_funcOfAND_given_QUAD_2_INPUT_AND_and_either_one_is_LOW_in_one_input_should_return_LOW(void)
+{
+    Module *AND;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[0]).state = HIGH;
+    (AND->pin[1]).state = LOW;
+
+    TEST_ASSERT_EQUAL(LOW, funcOfAND(AND, AND->pin[0].pinNumber, inputType));
+
+    destroyModule(AND);
+}
+
+void test_funcOfAND_given_TRI_3_INPUT_AND_and_HIGH_in_all_input_should_return_HIGH(void)
+{
+    Module *AND;
+    int inputType = TRI_3_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[6]).state = HIGH;
+    (AND->pin[7]).state = HIGH;
+    (AND->pin[8]).state = HIGH;
+
+    TEST_ASSERT_EQUAL(HIGH, funcOfAND(AND, AND->pin[6].pinNumber, inputType));
+
+    destroyModule(AND);
+}
+
+void test_funcOfAND_given_TRI_3_INPUT_AND_and_either_one_is_LOW_in_one_input_should_return_HIGH(void)
+{
+    Module *AND;
+    int inputType = TRI_3_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[0]).state = HIGH;
+    (AND->pin[1]).state = LOW;
+    (AND->pin[2]).state = HIGH;
+
+    TEST_ASSERT_EQUAL(LOW, funcOfAND(AND, AND->pin[0].pinNumber, inputType));
+
+    destroyModule(AND);
+}
+
+void test_funcOfAND_given_DUAL_4_INPUT_AND_and_HIGH_in_all_input_should_return_HIGH(void)
+{
+    Module *AND;
+    int inputType = DUAL_4_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[0]).state = HIGH;
+    (AND->pin[1]).state = HIGH;
+    (AND->pin[2]).state = HIGH;
+    (AND->pin[3]).state = HIGH;
+
+    TEST_ASSERT_EQUAL(HIGH, funcOfAND(AND, AND->pin[0].pinNumber, inputType));
+
+    destroyModule(AND);
+}
+
+void test_funcOfAND_given_DUAL_4_INPUT_AND_and_either_one_is_LOW_in_one_input_should_return_HIGH(void)
+{
+    Module *AND;
+    int inputType = DUAL_4_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[0]).state = HIGH;
+    (AND->pin[1]).state = LOW;
+    (AND->pin[2]).state = HIGH;
+    (AND->pin[3]).state = HIGH;
+
+    TEST_ASSERT_EQUAL(LOW, funcOfAND(AND, AND->pin[0].pinNumber, inputType));
 
     destroyModule(AND);
 }
@@ -500,7 +578,6 @@ void test_setPipe_given_pipe_with_AND_module_data_should_register_event_for_pipe
     TEST_ASSERT_EQUAL(HIGH, pipe->stateToFire);
 
     destroyModule(AND);
-    destroyPipe(pipe);
 }
 
 void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pipe_data(void)
@@ -512,6 +589,7 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
+    // printf("state: %d\n", AND->pin[0].state);
     pipe = createdPipeModule();
     pipe->stateToFire = HIGH;
     storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
@@ -576,6 +654,9 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     Node and1RootNode, and2Node, orNode;
     int inputType = QUAD_2_INPUT;
 
+    printf("%s\n", __DATE__);
+    printf("%s\n", __TIME__);
+    printf("%d\n", __STDC__);
     AND1 = createdAndModule(inputType);
     AND2 = createdAndModule(inputType);
     OR = createdAndModule(inputType);
