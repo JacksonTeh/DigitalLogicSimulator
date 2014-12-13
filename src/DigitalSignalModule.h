@@ -84,29 +84,37 @@ void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum);
 
 Module *createdAndModule(int inputType);
 Module *createdOrModule(int inputType);
-Module *createdXorModule(int numberOfPin);
-Module *createdNandModule(int numberOfPin);
-Module *createdNorModule(int numberOfPin);
-Module *createdNotModule(int numberOfPin);
+Module *createdXorModule(int inputType);
+Module *createdNandModule(int inputType);
+Module *createdNorModule(int inputType);
+Module *createdNotModule(int inputType);
 void destroyModule(Module *module);
 
 void andEvent(void *moduleAndPin);
 void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay);
-int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
-int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
-int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
 int funcOfAND(Module *module, int pinNumber, int inputType);
 // void setAnd(void *module, void *pin, int state, unsigned long long inputDelay);
+
 void orEvent(void *moduleAndPin);
 void setOr(void *moduleAndPin, int state, unsigned long long inputDelay);
-// int xorEvent(void *module);
-// void setXor(void *module, void *pin, int state, unsigned long long inputDelay);
-// int nandEvent(void *module);
-// void setNand(void *module, void *pin, int state, unsigned long long inputDelay);
-// int norEvent(void *module);
-// void setNor(void *module, void *pin, int state, unsigned long long inputDelay);
-// int notEvent(void *module);
-// void setNot(void *module, void *pin, int state, unsigned long long inputDelay);
+int funcOfOR(Module *module, int pinNumber, int inputType);
+
+void xorEvent(void *moduleAndPin);
+void setXor(void *moduleAndPin, int state, unsigned long long inputDelay);
+int funcOfXOR(Module *module, int pinNumber, int inputType);
+
+void nandEvent(void *moduleAndPin);
+void setNand(void *moduleAndPin, int state, unsigned long long inputDelay);
+int funcOfNAND(Module *module, int pinNumber, int inputType);
+
+void norEvent(void *moduleAndPin);
+void setNor(void *moduleAndPin, int state, unsigned long long inputDelay);
+int funcOfNOR(Module *module, int pinNumber, int inputType);
+
+void notEvent(void *moduleAndPin);
+void setNot(void *moduleAndPin, int state, unsigned long long inputDelay);
+int funcOfNOT(Module *module, int pinNumber);
+
 // Module *configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
 
@@ -114,5 +122,10 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
 
 int determineNumOfInputPin(int inputType);
 int determineNumOfOutputPin(int inputType);
+
+int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
+int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
+int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType));
+int outputConnectionForHexInv(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber));
 
 #endif // DigitalSignalModule_H

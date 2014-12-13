@@ -5,7 +5,7 @@
 #include "InitNode.h"
 
 /**
- * Series No.   Description                 Delay
+ * Series No.   Description                 Delay, tpd
  * =========================================================
  * 74LS00       Quad 2-input NAND Gate      9.5ns
  * 74LS10       Triple 3-input NAND Gate    9.5ns   ==> NAND
@@ -101,145 +101,6 @@ void andEvent(void *moduleAndPin)
         AND->module->pin[outputPinNumber].pipe->set((void *)AND->module->pin[outputPinNumber].pipe, AND->module->pin[outputPinNumber].state, ONE_NANO_SEC);
 }
 
-int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
-{
-    if(pinNumber < 2)
-    {
-        if((pinNumber + 1) %2 == 0)
-            (module->pin[8]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-        else
-            (module->pin[8]).state = gateFunction(module, pinNumber, module->typeOfInput);
-
-        return 8;
-    }
-    else if(pinNumber > 1 && pinNumber < 4)
-    {
-        if((pinNumber + 1) %2 == 0)
-            (module->pin[9]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-        else
-            (module->pin[9]).state = gateFunction(module, pinNumber, module->typeOfInput);
-
-        return 9;
-    }
-    else if(pinNumber > 3 && pinNumber < 6)
-    {
-        if((pinNumber + 1) %2 == 0)
-            (module->pin[10]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-        else
-            (module->pin[10]).state = gateFunction(module, pinNumber, module->typeOfInput);
-
-        return 10;
-    }
-    else if(pinNumber > 5 && pinNumber < 8)
-    {
-        if((pinNumber + 1) %2 == 0)
-            (module->pin[11]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-        else
-            (module->pin[11]).state = gateFunction(module, pinNumber, module->typeOfInput);
-
-        return 11;
-    }
-}
-
-int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
-{
-    if(pinNumber < 3)
-    {
-        switch(pinNumber)
-        {
-            case 0: 
-                (module->pin[9]).state = gateFunction(module, pinNumber, module->typeOfInput);
-                break;
-            case 1:
-                (module->pin[9]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-                break;
-            case 2:
-                (module->pin[9]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
-                break;
-        }
-
-        return 9;
-    }
-    else if(pinNumber > 2 && pinNumber < 6)
-    {
-        switch(pinNumber)
-        {
-            case 3:
-                (module->pin[10]).state = gateFunction(module, pinNumber, module->typeOfInput);
-                break;
-            case 4:
-                (module->pin[10]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-                break;
-            case 5:
-                (module->pin[10]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
-                break;
-        }
-
-        return 10;
-    }
-    else if(pinNumber > 5 && pinNumber < 9)
-    {
-        switch(pinNumber)
-        {
-            case 6:
-                (module->pin[11]).state = gateFunction(module, pinNumber, module->typeOfInput);
-                break;
-            case 7:
-                (module->pin[11]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-                break;
-            case 8:
-                (module->pin[11]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
-                break;
-        }
-
-        return 11;
-    }
-}
-
-int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
-{
-    if(pinNumber < 4)
-    {
-        switch(pinNumber)
-        {
-            case 0:
-                (module->pin[8]).state = gateFunction(module, pinNumber, module->typeOfInput);
-                break;
-            case 1:
-                (module->pin[8]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-                break;
-            case 2:
-                (module->pin[8]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
-                break;
-            case 3:
-                (module->pin[8]).state = gateFunction(module, pinNumber-3, module->typeOfInput);
-                break;
-        }
-
-        return 8;
-    }
-    else if(pinNumber > 3 && pinNumber < 8)
-    {
-        switch(pinNumber)
-        {
-            case 4:
-                (module->pin[9]).state = gateFunction(module, pinNumber, module->typeOfInput);
-                break;
-            case 5:
-                (module->pin[9]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
-                break;
-            case 6:
-                (module->pin[9]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
-                break;
-            case 7:
-                (module->pin[9]).state = gateFunction(module, pinNumber-3, module->typeOfInput);
-                break;
-        }
-
-        return 9;
-    }
-}
-
 int funcOfAND(Module *module, int pinNumber, int inputType)
 {
     if(inputType == QUAD_2_INPUT)
@@ -300,7 +161,6 @@ Module *createdOrModule(int inputType)
     OR->configure = configureInputOutput;
     OR->typeOfInput = inputType;
     OR->totalPin = TOTAL_PIN;
-    // OR->pipe = NULL;
 
     if(inputType == HEX_INV || (inputType != QUAD_2_INPUT && inputType != TRI_3_INPUT && inputType != DUAL_4_INPUT))
         Throw(ERR_INVALID_INPUT_TYPE);
@@ -313,8 +173,8 @@ Module *createdOrModule(int inputType)
     {
         (OR->pin[i]).type = INPUT_PIN;
         (OR->pin[i]).pinNumber = i;
+        (OR->pin[i]).state = LOW;
         (OR->pin[i]).pipe = NULL;
-        // (OR->pin[i]).moduleConnected = NULL;
     }
 
     j = i + numberOfOutPin;
@@ -327,6 +187,7 @@ Module *createdOrModule(int inputType)
             (OR->pin[i]).type = UNUSED_PIN;
 
         (OR->pin[i]).pinNumber = i;
+        (OR->pin[i]).state = LOW;
         (OR->pin[i]).pipe = NULL;
     }
 
@@ -335,12 +196,65 @@ Module *createdOrModule(int inputType)
 
 void orEvent(void *moduleAndPin)
 {
+    ModuleAndPin *OR = (ModuleAndPin *)moduleAndPin;
+    int outputPinNumber;
 
+    if(OR->module->typeOfInput == QUAD_2_INPUT)
+    {
+        outputPinNumber = outputConnectionForQuad2Input(OR->module, OR->pin->pinNumber, funcOfOR);
+    }
+    else if(OR->module->typeOfInput == TRI_3_INPUT)
+    {
+        outputPinNumber = outputConnectionForTri3Input(OR->module, OR->pin->pinNumber, funcOfOR);
+    }
+    else if(OR->module->typeOfInput == DUAL_4_INPUT)
+    {
+        outputPinNumber = outputConnectionForDual4Input(OR->module, OR->pin->pinNumber, funcOfOR);
+    }
+
+    if(OR->module->pin[outputPinNumber].pipe != NULL)
+        OR->module->pin[outputPinNumber].pipe->set((void *)OR->module->pin[outputPinNumber].pipe, OR->module->pin[outputPinNumber].state, ONE_NANO_SEC);
 }
 
 void setOr(void *moduleAndPin, int state, unsigned long long inputDelay)
 {
+    ModuleAndPin *OR = (ModuleAndPin *)moduleAndPin;
 
+    if(OR->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    if(state != OR->pin->state)
+    {
+        OR->pin->state = state;
+        registerEvent(OR, NULL, inputDelay);
+    }
+}
+
+int funcOfOR(Module *module, int pinNumber, int inputType)
+{
+    if(inputType == QUAD_2_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH || module->pin[pinNumber+1].state == HIGH)
+            return HIGH;
+        else if(module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW)
+            return LOW;
+    }
+    else if(inputType == TRI_3_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH || module->pin[pinNumber+1].state == HIGH || module->pin[pinNumber+2].state == HIGH)
+            return HIGH;
+        else if(module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW && module->pin[pinNumber+2].state == LOW)
+            return LOW;
+    }
+    else if(DUAL_4_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH || module->pin[pinNumber+1].state == HIGH
+            || module->pin[pinNumber+2].state == HIGH || module->pin[pinNumber+3].state == HIGH)
+            return HIGH;
+        else if(module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW
+                && module->pin[pinNumber+2].state == LOW && module->pin[pinNumber+3].state == LOW)
+            return LOW;
+    }
 }
 
 /**
@@ -348,80 +262,419 @@ void setOr(void *moduleAndPin, int state, unsigned long long inputDelay)
  * |       XOR Gate       |
  * ========================
  */
-// Module *createdXorModule(int numberOfPin)
-// {
+Module *createdXorModule(int inputType)
+{
+    Module *XOR;
+    int i, j, numberOfInPin, numberOfOutPin;
 
-// }
+    XOR = malloc(sizeof(Module));
+    XOR->name = "XOR";
+    XOR->event = xorEvent;
+    XOR->set = setXor;
+    XOR->configure = configureInputOutput;
+    XOR->typeOfInput = inputType;
+    XOR->totalPin = TOTAL_PIN;
 
-// int xorEvent(void *module)
-// {
+    if(inputType == HEX_INV || inputType == DUAL_4_INPUT)
+        Throw(ERR_INVALID_INPUT_TYPE);
 
-// }
+    numberOfInPin = determineNumOfInputPin(inputType);
+    numberOfOutPin = determineNumOfOutputPin(inputType);
 
-// void setXor(void *module, void *pin, int state, unsigned long long inputDelay)
-// {
+    /* Initialise pin */
+    for(i = 0; i < numberOfInPin; i++)
+    {
+        (XOR->pin[i]).type = INPUT_PIN;
+        (XOR->pin[i]).pinNumber = i;
+        (XOR->pin[i]).state = LOW;
+        (XOR->pin[i]).pipe = NULL;
+    }
 
-// }
+    j = i + numberOfOutPin;
+
+    for(; i < XOR->totalPin; i++)
+    {
+        if(i < j)
+            (XOR->pin[i]).type = OUTPUT_PIN;
+        else
+            (XOR->pin[i]).type = UNUSED_PIN;
+
+        (XOR->pin[i]).pinNumber = i;
+        (XOR->pin[i]).state = LOW;
+        (XOR->pin[i]).pipe = NULL;
+    }
+
+    return XOR;
+}
+
+void xorEvent(void *moduleAndPin)
+{
+    ModuleAndPin *XOR = (ModuleAndPin *)moduleAndPin;
+    int outputPinNumber;
+
+    if(XOR->module->typeOfInput == QUAD_2_INPUT)
+    {
+        outputPinNumber = outputConnectionForQuad2Input(XOR->module, XOR->pin->pinNumber, funcOfXOR);
+    }
+    else if(XOR->module->typeOfInput == TRI_3_INPUT)
+    {
+        outputPinNumber = outputConnectionForTri3Input(XOR->module, XOR->pin->pinNumber, funcOfXOR);
+    }
+
+    if(XOR->module->pin[outputPinNumber].pipe != NULL)
+        XOR->module->pin[outputPinNumber].pipe->set((void *)XOR->module->pin[outputPinNumber].pipe, XOR->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+}
+
+void setXor(void *moduleAndPin, int state, unsigned long long inputDelay)
+{
+    ModuleAndPin *XOR = (ModuleAndPin *)moduleAndPin;
+
+    if(XOR->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    if(state != XOR->pin->state)
+    {
+        XOR->pin->state = state;
+        registerEvent(XOR, NULL, inputDelay);
+    }
+}
+
+int funcOfXOR(Module *module, int pinNumber, int inputType)
+{
+    int i, odd = 0;
+
+    if(inputType == QUAD_2_INPUT)
+    {
+        if((module->pin[pinNumber].state == HIGH && module->pin[pinNumber+1].state == LOW)
+            || (module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == HIGH))
+            return HIGH;
+        else if((module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW)
+                || (module->pin[pinNumber].state == HIGH && module->pin[pinNumber+1].state == HIGH))
+            return LOW;
+    }
+    else if(inputType == TRI_3_INPUT)
+    {
+        for(i = pinNumber; i < pinNumber + 3; i++)
+        {
+            if(module->pin[i].state == HIGH)
+                odd++;
+        }
+
+        if(odd % 2 != 0)
+            return HIGH;
+        else
+            return LOW;
+    }
+}
 
 /**
  * ========================
  * |      NAND Gate       |
  * ========================
  */
-// Module *createdNandModule(int numberOfPin)
-// {
+Module *createdNandModule(int inputType)
+{
+    Module *NAND;
+    int i, j, numberOfInPin, numberOfOutPin;
 
-// }
+    NAND = malloc(sizeof(Module));
+    NAND->name = "NAND";
+    NAND->event = nandEvent;
+    NAND->set = setNand;
+    NAND->configure = configureInputOutput;
+    NAND->typeOfInput = inputType;
+    NAND->totalPin = TOTAL_PIN;
 
-// int nandEvent(void *module)
-// {
+    if(inputType == HEX_INV || (inputType != QUAD_2_INPUT && inputType != TRI_3_INPUT && inputType != DUAL_4_INPUT))
+        Throw(ERR_INVALID_INPUT_TYPE);
 
-// }
+    numberOfInPin = determineNumOfInputPin(inputType);
+    numberOfOutPin = determineNumOfOutputPin(inputType);
 
-// void setNand(void *module, void *pin, int state, unsigned long long inputDelay)
-// {
+    /* Initialise pin */
+    for(i = 0; i < numberOfInPin; i++)
+    {
+        (NAND->pin[i]).type = INPUT_PIN;
+        (NAND->pin[i]).pinNumber = i;
+        (NAND->pin[i]).state = LOW;
+        (NAND->pin[i]).pipe = NULL;
+    }
 
-// }
+    j = i + numberOfOutPin;
+
+    for(; i < NAND->totalPin; i++)
+    {
+        if(i < j)
+            (NAND->pin[i]).type = OUTPUT_PIN;
+        else
+            (NAND->pin[i]).type = UNUSED_PIN;
+
+        (NAND->pin[i]).pinNumber = i;
+        (NAND->pin[i]).state = LOW;
+        (NAND->pin[i]).pipe = NULL;
+    }
+
+    return NAND;
+}
+
+void nandEvent(void *moduleAndPin)
+{
+    ModuleAndPin *NAND = (ModuleAndPin *)moduleAndPin;
+    int outputPinNumber;
+
+    if(NAND->module->typeOfInput == QUAD_2_INPUT)
+    {
+        outputPinNumber = outputConnectionForQuad2Input(NAND->module, NAND->pin->pinNumber, funcOfNAND);
+    }
+    else if(NAND->module->typeOfInput == TRI_3_INPUT)
+    {
+        outputPinNumber = outputConnectionForTri3Input(NAND->module, NAND->pin->pinNumber, funcOfNAND);
+    }
+    else if(NAND->module->typeOfInput == DUAL_4_INPUT)
+    {
+        outputPinNumber = outputConnectionForDual4Input(NAND->module, NAND->pin->pinNumber, funcOfNAND);
+    }
+
+    if(NAND->module->pin[outputPinNumber].pipe != NULL)
+        NAND->module->pin[outputPinNumber].pipe->set((void *)NAND->module->pin[outputPinNumber].pipe, NAND->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+}
+
+void setNand(void *moduleAndPin, int state, unsigned long long inputDelay)
+{
+    ModuleAndPin *NAND = (ModuleAndPin *)moduleAndPin;
+
+    if(NAND->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    if(state != NAND->pin->state)
+    {
+        NAND->pin->state = state;
+        registerEvent(NAND, NULL, inputDelay);
+    }
+}
+
+int funcOfNAND(Module *module, int pinNumber, int inputType)
+{
+    if(inputType == QUAD_2_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH && module->pin[pinNumber+1].state == HIGH)
+            return LOW;
+        else if(module->pin[pinNumber].state == LOW || module->pin[pinNumber+1].state == LOW)
+            return HIGH;
+    }
+    else if(inputType == TRI_3_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH && module->pin[pinNumber+1].state == HIGH && module->pin[pinNumber+2].state == HIGH)
+            return LOW;
+        else if(module->pin[pinNumber].state == LOW || module->pin[pinNumber+1].state == LOW || module->pin[pinNumber+2].state == LOW)
+            return HIGH;
+    }
+    else if(DUAL_4_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH && module->pin[pinNumber+1].state == HIGH
+            && module->pin[pinNumber+2].state == HIGH && module->pin[pinNumber+3].state == HIGH)
+            return LOW;
+        else if(module->pin[pinNumber].state == LOW || module->pin[pinNumber+1].state == LOW
+                || module->pin[pinNumber+2].state == LOW || module->pin[pinNumber+3].state == LOW)
+            return HIGH;
+    }
+}
 
 /**
  * ========================
  * |       NOR Gate       |
  * ========================
  */
-// Module *createdNorModule(int numberOfPin)
-// {
+Module *createdNorModule(int inputType)
+{
+    Module *NOR;
+    int i, j, numberOfInPin, numberOfOutPin;
 
-// }
+    NOR = malloc(sizeof(Module));
+    NOR->name = "NOR";
+    NOR->event = norEvent;
+    NOR->set = setNor;
+    NOR->configure = configureInputOutput;
+    NOR->typeOfInput = inputType;
+    NOR->totalPin = TOTAL_PIN;
 
-// int norEvent(void *module)
-// {
+    if(inputType == HEX_INV || (inputType != QUAD_2_INPUT && inputType != TRI_3_INPUT && inputType != DUAL_4_INPUT))
+        Throw(ERR_INVALID_INPUT_TYPE);
 
-// }
+    numberOfInPin = determineNumOfInputPin(inputType);
+    numberOfOutPin = determineNumOfOutputPin(inputType);
 
-// void setNor(void *module, void *pin, int state, unsigned long long inputDelay)
-// {
+    /* Initialise pin */
+    for(i = 0; i < numberOfInPin; i++)
+    {
+        (NOR->pin[i]).type = INPUT_PIN;
+        (NOR->pin[i]).pinNumber = i;
+        (NOR->pin[i]).state = LOW;
+        (NOR->pin[i]).pipe = NULL;
+    }
 
-// }
+    j = i + numberOfOutPin;
+
+    for(; i < NOR->totalPin; i++)
+    {
+        if(i < j)
+            (NOR->pin[i]).type = OUTPUT_PIN;
+        else
+            (NOR->pin[i]).type = UNUSED_PIN;
+
+        (NOR->pin[i]).pinNumber = i;
+        (NOR->pin[i]).state = LOW;
+        (NOR->pin[i]).pipe = NULL;
+    }
+
+    return NOR;
+}
+
+void norEvent(void *moduleAndPin)
+{
+    ModuleAndPin *NOR = (ModuleAndPin *)moduleAndPin;
+    int outputPinNumber;
+
+    if(NOR->module->typeOfInput == QUAD_2_INPUT)
+    {
+        outputPinNumber = outputConnectionForQuad2Input(NOR->module, NOR->pin->pinNumber, funcOfNOR);
+    }
+    else if(NOR->module->typeOfInput == TRI_3_INPUT)
+    {
+        outputPinNumber = outputConnectionForTri3Input(NOR->module, NOR->pin->pinNumber, funcOfNOR);
+    }
+    else if(NOR->module->typeOfInput == DUAL_4_INPUT)
+    {
+        outputPinNumber = outputConnectionForDual4Input(NOR->module, NOR->pin->pinNumber, funcOfNOR);
+    }
+
+    if(NOR->module->pin[outputPinNumber].pipe != NULL)
+        NOR->module->pin[outputPinNumber].pipe->set((void *)NOR->module->pin[outputPinNumber].pipe, NOR->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+}
+
+void setNor(void *moduleAndPin, int state, unsigned long long inputDelay)
+{
+    ModuleAndPin *NOR = (ModuleAndPin *)moduleAndPin;
+
+    if(NOR->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    if(state != NOR->pin->state)
+    {
+        NOR->pin->state = state;
+        registerEvent(NOR, NULL, inputDelay);
+    }
+}
+
+int funcOfNOR(Module *module, int pinNumber, int inputType)
+{
+    if(inputType == QUAD_2_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH || module->pin[pinNumber+1].state == HIGH)
+            return LOW;
+        else if(module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW)
+            return HIGH;
+    }
+    else if(inputType == TRI_3_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH || module->pin[pinNumber+1].state == HIGH || module->pin[pinNumber+2].state == HIGH)
+            return LOW;
+        else if(module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW && module->pin[pinNumber+2].state == LOW)
+            return HIGH;
+    }
+    else if(DUAL_4_INPUT)
+    {
+        if(module->pin[pinNumber].state == HIGH || module->pin[pinNumber+1].state == HIGH
+            || module->pin[pinNumber+2].state == HIGH || module->pin[pinNumber+3].state == HIGH)
+            return LOW;
+        else if(module->pin[pinNumber].state == LOW && module->pin[pinNumber+1].state == LOW
+                && module->pin[pinNumber+2].state == LOW && module->pin[pinNumber+3].state == LOW)
+            return HIGH;
+    }
+}
 
 /**
  * ========================
  * |       NOT Gate       |
  * ========================
  */
-// Module *createdNotModule(int numberOfPin)
-// {
+Module *createdNotModule(int inputType)
+{
+    Module *NOT;
+    int i, j, numberOfInPin, numberOfOutPin;
 
-// }
+    NOT = malloc(sizeof(Module));
+    NOT->name = "NOT";
+    NOT->event = notEvent;
+    NOT->set = setNot;
+    NOT->configure = configureInputOutput;
+    NOT->typeOfInput = inputType;
+    NOT->totalPin = TOTAL_PIN;
 
-// int notEvent(void *module)
-// {
+    if(inputType != HEX_INV)
+        Throw(ERR_INVALID_INPUT_TYPE);
 
-// }
+    numberOfInPin = determineNumOfInputPin(inputType);
+    numberOfOutPin = determineNumOfOutputPin(inputType);
 
-// void setNot(void *module, void *pin, int state, unsigned long long inputDelay)
-// {
+    /* Initialise pin */
+    for(i = 0; i < numberOfInPin; i++)
+    {
+        (NOT->pin[i]).type = INPUT_PIN;
+        (NOT->pin[i]).pinNumber = i;
+        (NOT->pin[i]).state = LOW;
+        (NOT->pin[i]).pipe = NULL;
+    }
 
-// }
+    j = i + numberOfOutPin;
+
+    for(; i < NOT->totalPin; i++)
+    {
+        if(i < j)
+            (NOT->pin[i]).type = OUTPUT_PIN;
+        else
+            (NOT->pin[i]).type = UNUSED_PIN;
+
+        (NOT->pin[i]).pinNumber = i;
+        (NOT->pin[i]).state = LOW;
+        (NOT->pin[i]).pipe = NULL;
+    }
+
+    return NOT;
+}
+
+void notEvent(void *moduleAndPin)
+{
+    ModuleAndPin *NOT = (ModuleAndPin *)moduleAndPin;
+    int outputPinNumber;
+
+    outputPinNumber = outputConnectionForHexInv(NOT->module, NOT->pin->pinNumber, funcOfNOT);
+
+    if(NOT->module->pin[outputPinNumber].pipe != NULL)
+        NOT->module->pin[outputPinNumber].pipe->set((void *)NOT->module->pin[outputPinNumber].pipe, NOT->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+}
+
+void setNot(void *moduleAndPin, int state, unsigned long long inputDelay)
+{
+    ModuleAndPin *NOT = (ModuleAndPin *)moduleAndPin;
+
+    if(NOT->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    if(state != NOT->pin->state)
+    {
+        NOT->pin->state = state;
+        registerEvent(NOT, NULL, inputDelay);
+    }
+}
+
+int funcOfNOT(Module *module, int pinNumber)
+{
+    if(module->pin[pinNumber].state == HIGH)
+        return LOW;
+    else if(module->pin[pinNumber].state == LOW)
+        return HIGH;
+}
 
 void destroyModule(Module *module)
 {
@@ -592,6 +845,176 @@ int determineNumOfOutputPin(int inputType)
         return 6;
     else
         return 0;
+}
+
+int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
+{
+    if(pinNumber < 2)
+    {
+        if((pinNumber + 1) %2 == 0)
+            (module->pin[8]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+        else
+            (module->pin[8]).state = gateFunction(module, pinNumber, module->typeOfInput);
+
+        return 8;
+    }
+    else if(pinNumber > 1 && pinNumber < 4)
+    {
+        if((pinNumber + 1) %2 == 0)
+            (module->pin[9]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+        else
+            (module->pin[9]).state = gateFunction(module, pinNumber, module->typeOfInput);
+
+        return 9;
+    }
+    else if(pinNumber > 3 && pinNumber < 6)
+    {
+        if((pinNumber + 1) %2 == 0)
+            (module->pin[10]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+        else
+            (module->pin[10]).state = gateFunction(module, pinNumber, module->typeOfInput);
+
+        return 10;
+    }
+    else if(pinNumber > 5 && pinNumber < 8)
+    {
+        if((pinNumber + 1) %2 == 0)
+            (module->pin[11]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+        else
+            (module->pin[11]).state = gateFunction(module, pinNumber, module->typeOfInput);
+
+        return 11;
+    }
+}
+
+int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
+{
+    if(pinNumber < 3)
+    {
+        switch(pinNumber)
+        {
+            case 0:
+                (module->pin[9]).state = gateFunction(module, pinNumber, module->typeOfInput);
+                break;
+            case 1:
+                (module->pin[9]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+                break;
+            case 2:
+                (module->pin[9]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
+                break;
+        }
+
+        return 9;
+    }
+    else if(pinNumber > 2 && pinNumber < 6)
+    {
+        switch(pinNumber)
+        {
+            case 3:
+                (module->pin[10]).state = gateFunction(module, pinNumber, module->typeOfInput);
+                break;
+            case 4:
+                (module->pin[10]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+                break;
+            case 5:
+                (module->pin[10]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
+                break;
+        }
+
+        return 10;
+    }
+    else if(pinNumber > 5 && pinNumber < 9)
+    {
+        switch(pinNumber)
+        {
+            case 6:
+                (module->pin[11]).state = gateFunction(module, pinNumber, module->typeOfInput);
+                break;
+            case 7:
+                (module->pin[11]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+                break;
+            case 8:
+                (module->pin[11]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
+                break;
+        }
+
+        return 11;
+    }
+}
+
+int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
+{
+    if(pinNumber < 4)
+    {
+        switch(pinNumber)
+        {
+            case 0:
+                (module->pin[8]).state = gateFunction(module, pinNumber, module->typeOfInput);
+                break;
+            case 1:
+                (module->pin[8]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+                break;
+            case 2:
+                (module->pin[8]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
+                break;
+            case 3:
+                (module->pin[8]).state = gateFunction(module, pinNumber-3, module->typeOfInput);
+                break;
+        }
+
+        return 8;
+    }
+    else if(pinNumber > 3 && pinNumber < 8)
+    {
+        switch(pinNumber)
+        {
+            case 4:
+                (module->pin[9]).state = gateFunction(module, pinNumber, module->typeOfInput);
+                break;
+            case 5:
+                (module->pin[9]).state = gateFunction(module, pinNumber-1, module->typeOfInput);
+                break;
+            case 6:
+                (module->pin[9]).state = gateFunction(module, pinNumber-2, module->typeOfInput);
+                break;
+            case 7:
+                (module->pin[9]).state = gateFunction(module, pinNumber-3, module->typeOfInput);
+                break;
+        }
+
+        return 9;
+    }
+}
+
+int outputConnectionForHexInv(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber))
+{
+    int outputPinNumber;
+
+    switch(pinNumber)
+    {
+        case 0:
+            outputPinNumber = 6;
+            break;
+        case 1:
+            outputPinNumber = 7;
+            break;
+        case 2:
+            outputPinNumber = 8;
+            break;
+        case 3:
+            outputPinNumber = 9;
+            break;
+        case 4:
+            outputPinNumber = 10;
+            break;
+        case 5:
+            outputPinNumber = 11;
+            break;
+    }
+
+    module->pin[outputPinNumber].state = gateFunction(module, pinNumber);
+
+    return outputPinNumber;
 }
 
 // void pipeAttach(Pipe **pipe, Module **fromModule , void *fromPin, Module *toModule, void *toPin)
