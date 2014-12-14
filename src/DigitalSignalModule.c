@@ -3,6 +3,7 @@
 #include "DigitalSignalModule.h"
 #include "RedBlackTree.h"
 #include "InitNode.h"
+#include "EventTime.h"
 
 /**
  * Series No.   Description                 Delay, tpd
@@ -43,7 +44,6 @@ Module *createdAndModule(int inputType)
     AND->configure = configureInputOutput;
     AND->typeOfInput = inputType;
     AND->totalPin = TOTAL_PIN;
-    // AND->pipe = NULL;
 
     if(inputType == HEX_INV || (inputType != QUAD_2_INPUT && inputType != TRI_3_INPUT && inputType != DUAL_4_INPUT))
         Throw(ERR_INVALID_INPUT_TYPE);
@@ -58,7 +58,6 @@ Module *createdAndModule(int inputType)
         (AND->pin[i]).pinNumber = i;
         (AND->pin[i]).state = LOW;
         (AND->pin[i]).pipe = NULL;
-        // (AND->pin[i]).moduleConnected = NULL;
     }
 
     j = i + numberOfOutPin;
@@ -78,29 +77,43 @@ Module *createdAndModule(int inputType)
     return AND;
 }
 
-// int andEvent(void *module, void *pin)
-void andEvent(void *moduleAndPin)
+void andEvent(void *moduleAndPin, unsigned long long delay)
 {
     ModuleAndPin *AND = (ModuleAndPin *)moduleAndPin;
     int outputPinNumber;
 
     if(AND->module->typeOfInput == QUAD_2_INPUT)
-    {
         outputPinNumber = outputConnectionForQuad2Input(AND->module, AND->pin->pinNumber, funcOfAND);
-    }
     else if(AND->module->typeOfInput == TRI_3_INPUT)
-    {
         outputPinNumber = outputConnectionForTri3Input(AND->module, AND->pin->pinNumber, funcOfAND);
-    }
     else if(AND->module->typeOfInput == DUAL_4_INPUT)
-    {
         outputPinNumber = outputConnectionForDual4Input(AND->module, AND->pin->pinNumber, funcOfAND);
-    }
 
-    if(AND->module->pin[outputPinNumber].pipe != NULL)
-        AND->module->pin[outputPinNumber].pipe->set((void *)AND->module->pin[outputPinNumber].pipe, AND->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+    if(AND->module->pin[outputPinNumber].pipe != NULL)      //set pipe if pipe is connected
+        AND->module->pin[outputPinNumber].pipe->set((void *)AND->module->pin[outputPinNumber].pipe, AND->module->pin[outputPinNumber].state, delay);
 }
 
+void setAnd(void *moduleAndPin, int state, unsigned long long delay)
+{
+    ModuleAndPin *AND = (ModuleAndPin *)moduleAndPin;
+
+    if(AND->pin->type != INPUT_PIN)
+        Throw(ERR_NOT_IN_PIN);
+
+    delay = delay + AND_PROPAGATION_DELAY;
+
+    if(state != AND->pin->state)
+    {
+        AND->pin->state = state;
+        registerEvent(AND, NULL, delay);
+    }
+}
+
+/**
+ *
+ * AND gate logic
+ *
+ */
 int funcOfAND(Module *module, int pinNumber, int inputType)
 {
     if(inputType == QUAD_2_INPUT)
@@ -125,22 +138,6 @@ int funcOfAND(Module *module, int pinNumber, int inputType)
         else if(module->pin[pinNumber].state == LOW || module->pin[pinNumber+1].state == LOW
                 || module->pin[pinNumber+2].state == LOW || module->pin[pinNumber+3].state == LOW)
             return LOW;
-    }
-}
-
-// void setAnd(void *module, void *pin, int state, unsigned long long inputDelay)
-void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay)
-{
-    ModuleAndPin *AND = (ModuleAndPin *)moduleAndPin;
-    // Pin *ANDpin = (Pin *)pin;
-    // printf("!AND: %p\n", AND);
-    if(AND->pin->type != INPUT_PIN)
-        Throw(ERR_NOT_IN_PIN);
-
-    if(state != AND->pin->state)
-    {
-        AND->pin->state = state;
-        registerEvent(AND, NULL, inputDelay);
     }
 }
 
@@ -194,42 +191,43 @@ Module *createdOrModule(int inputType)
     return OR;
 }
 
-void orEvent(void *moduleAndPin)
+void orEvent(void *moduleAndPin, unsigned long long delay)
 {
     ModuleAndPin *OR = (ModuleAndPin *)moduleAndPin;
     int outputPinNumber;
 
     if(OR->module->typeOfInput == QUAD_2_INPUT)
-    {
         outputPinNumber = outputConnectionForQuad2Input(OR->module, OR->pin->pinNumber, funcOfOR);
-    }
     else if(OR->module->typeOfInput == TRI_3_INPUT)
-    {
         outputPinNumber = outputConnectionForTri3Input(OR->module, OR->pin->pinNumber, funcOfOR);
-    }
     else if(OR->module->typeOfInput == DUAL_4_INPUT)
-    {
         outputPinNumber = outputConnectionForDual4Input(OR->module, OR->pin->pinNumber, funcOfOR);
-    }
 
     if(OR->module->pin[outputPinNumber].pipe != NULL)
-        OR->module->pin[outputPinNumber].pipe->set((void *)OR->module->pin[outputPinNumber].pipe, OR->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+        OR->module->pin[outputPinNumber].pipe->set((void *)OR->module->pin[outputPinNumber].pipe, OR->module->pin[outputPinNumber].state, delay);
 }
 
-void setOr(void *moduleAndPin, int state, unsigned long long inputDelay)
+void setOr(void *moduleAndPin, int state, unsigned long long delay)
 {
     ModuleAndPin *OR = (ModuleAndPin *)moduleAndPin;
 
     if(OR->pin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
 
+    delay = delay + OR_PROPAGATION_DELAY;
+
     if(state != OR->pin->state)
     {
         OR->pin->state = state;
-        registerEvent(OR, NULL, inputDelay);
+        registerEvent(OR, NULL, delay);
     }
 }
 
+/**
+ *
+ * OR gate logic
+ *
+ */
 int funcOfOR(Module *module, int pinNumber, int inputType)
 {
     if(inputType == QUAD_2_INPUT)
@@ -307,38 +305,41 @@ Module *createdXorModule(int inputType)
     return XOR;
 }
 
-void xorEvent(void *moduleAndPin)
+void xorEvent(void *moduleAndPin, unsigned long long delay)
 {
     ModuleAndPin *XOR = (ModuleAndPin *)moduleAndPin;
     int outputPinNumber;
 
     if(XOR->module->typeOfInput == QUAD_2_INPUT)
-    {
         outputPinNumber = outputConnectionForQuad2Input(XOR->module, XOR->pin->pinNumber, funcOfXOR);
-    }
     else if(XOR->module->typeOfInput == TRI_3_INPUT)
-    {
         outputPinNumber = outputConnectionForTri3Input(XOR->module, XOR->pin->pinNumber, funcOfXOR);
-    }
 
     if(XOR->module->pin[outputPinNumber].pipe != NULL)
-        XOR->module->pin[outputPinNumber].pipe->set((void *)XOR->module->pin[outputPinNumber].pipe, XOR->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+        XOR->module->pin[outputPinNumber].pipe->set((void *)XOR->module->pin[outputPinNumber].pipe, XOR->module->pin[outputPinNumber].state, delay);
 }
 
-void setXor(void *moduleAndPin, int state, unsigned long long inputDelay)
+void setXor(void *moduleAndPin, int state, unsigned long long delay)
 {
     ModuleAndPin *XOR = (ModuleAndPin *)moduleAndPin;
 
     if(XOR->pin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
 
+    delay = delay + XOR_PROPAGATION_DELAY;
+
     if(state != XOR->pin->state)
     {
         XOR->pin->state = state;
-        registerEvent(XOR, NULL, inputDelay);
+        registerEvent(XOR, NULL, delay);
     }
 }
 
+/**
+ *
+ * XOR gate logic
+ *
+ */
 int funcOfXOR(Module *module, int pinNumber, int inputType)
 {
     int i, odd = 0;
@@ -417,42 +418,43 @@ Module *createdNandModule(int inputType)
     return NAND;
 }
 
-void nandEvent(void *moduleAndPin)
+void nandEvent(void *moduleAndPin, unsigned long long delay)
 {
     ModuleAndPin *NAND = (ModuleAndPin *)moduleAndPin;
     int outputPinNumber;
 
     if(NAND->module->typeOfInput == QUAD_2_INPUT)
-    {
         outputPinNumber = outputConnectionForQuad2Input(NAND->module, NAND->pin->pinNumber, funcOfNAND);
-    }
     else if(NAND->module->typeOfInput == TRI_3_INPUT)
-    {
         outputPinNumber = outputConnectionForTri3Input(NAND->module, NAND->pin->pinNumber, funcOfNAND);
-    }
     else if(NAND->module->typeOfInput == DUAL_4_INPUT)
-    {
         outputPinNumber = outputConnectionForDual4Input(NAND->module, NAND->pin->pinNumber, funcOfNAND);
-    }
 
     if(NAND->module->pin[outputPinNumber].pipe != NULL)
-        NAND->module->pin[outputPinNumber].pipe->set((void *)NAND->module->pin[outputPinNumber].pipe, NAND->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+        NAND->module->pin[outputPinNumber].pipe->set((void *)NAND->module->pin[outputPinNumber].pipe, NAND->module->pin[outputPinNumber].state, delay);
 }
 
-void setNand(void *moduleAndPin, int state, unsigned long long inputDelay)
+void setNand(void *moduleAndPin, int state, unsigned long long delay)
 {
     ModuleAndPin *NAND = (ModuleAndPin *)moduleAndPin;
 
     if(NAND->pin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
 
+    delay = delay + NAND_PROPAGATION_DELAY;
+
     if(state != NAND->pin->state)
     {
         NAND->pin->state = state;
-        registerEvent(NAND, NULL, inputDelay);
+        registerEvent(NAND, NULL, delay);
     }
 }
 
+/**
+ *
+ * NAND gate logic
+ *
+ */
 int funcOfNAND(Module *module, int pinNumber, int inputType)
 {
     if(inputType == QUAD_2_INPUT)
@@ -530,42 +532,43 @@ Module *createdNorModule(int inputType)
     return NOR;
 }
 
-void norEvent(void *moduleAndPin)
+void norEvent(void *moduleAndPin, unsigned long long delay)
 {
     ModuleAndPin *NOR = (ModuleAndPin *)moduleAndPin;
     int outputPinNumber;
 
     if(NOR->module->typeOfInput == QUAD_2_INPUT)
-    {
         outputPinNumber = outputConnectionForQuad2Input(NOR->module, NOR->pin->pinNumber, funcOfNOR);
-    }
     else if(NOR->module->typeOfInput == TRI_3_INPUT)
-    {
         outputPinNumber = outputConnectionForTri3Input(NOR->module, NOR->pin->pinNumber, funcOfNOR);
-    }
     else if(NOR->module->typeOfInput == DUAL_4_INPUT)
-    {
         outputPinNumber = outputConnectionForDual4Input(NOR->module, NOR->pin->pinNumber, funcOfNOR);
-    }
 
     if(NOR->module->pin[outputPinNumber].pipe != NULL)
-        NOR->module->pin[outputPinNumber].pipe->set((void *)NOR->module->pin[outputPinNumber].pipe, NOR->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+        NOR->module->pin[outputPinNumber].pipe->set((void *)NOR->module->pin[outputPinNumber].pipe, NOR->module->pin[outputPinNumber].state, delay);
 }
 
-void setNor(void *moduleAndPin, int state, unsigned long long inputDelay)
+void setNor(void *moduleAndPin, int state, unsigned long long delay)
 {
     ModuleAndPin *NOR = (ModuleAndPin *)moduleAndPin;
 
     if(NOR->pin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
 
+    delay = delay + NOR_PROPAGATION_DELAY;
+
     if(state != NOR->pin->state)
     {
         NOR->pin->state = state;
-        registerEvent(NOR, NULL, inputDelay);
+        registerEvent(NOR, NULL, delay);
     }
 }
 
+/**
+ *
+ * NOR gate logic
+ *
+ */
 int funcOfNOR(Module *module, int pinNumber, int inputType)
 {
     if(inputType == QUAD_2_INPUT)
@@ -643,7 +646,7 @@ Module *createdNotModule(int inputType)
     return NOT;
 }
 
-void notEvent(void *moduleAndPin)
+void notEvent(void *moduleAndPin, unsigned long long delay)
 {
     ModuleAndPin *NOT = (ModuleAndPin *)moduleAndPin;
     int outputPinNumber;
@@ -651,23 +654,30 @@ void notEvent(void *moduleAndPin)
     outputPinNumber = outputConnectionForHexInv(NOT->module, NOT->pin->pinNumber, funcOfNOT);
 
     if(NOT->module->pin[outputPinNumber].pipe != NULL)
-        NOT->module->pin[outputPinNumber].pipe->set((void *)NOT->module->pin[outputPinNumber].pipe, NOT->module->pin[outputPinNumber].state, ONE_NANO_SEC);
+        NOT->module->pin[outputPinNumber].pipe->set((void *)NOT->module->pin[outputPinNumber].pipe, NOT->module->pin[outputPinNumber].state, delay);
 }
 
-void setNot(void *moduleAndPin, int state, unsigned long long inputDelay)
+void setNot(void *moduleAndPin, int state, unsigned long long delay)
 {
     ModuleAndPin *NOT = (ModuleAndPin *)moduleAndPin;
 
     if(NOT->pin->type != INPUT_PIN)
         Throw(ERR_NOT_IN_PIN);
 
+    delay = delay + NOT_PROPAGATION_DELAY;
+
     if(state != NOT->pin->state)
     {
         NOT->pin->state = state;
-        registerEvent(NOT, NULL, inputDelay);
+        registerEvent(NOT, NULL, delay);
     }
 }
 
+/**
+ *
+ * NOT gate logic
+ *
+ */
 int funcOfNOT(Module *module, int pinNumber)
 {
     if(module->pin[pinNumber].state == HIGH)
@@ -682,7 +692,6 @@ void destroyModule(Module *module)
 
     if(module != NULL)
     {
-        // printf("module: %p\n", module);
 
         for(i = 0; i < TOTAL_PIN; i++)
         {
@@ -702,92 +711,55 @@ Pipe *createdPipeModule()
     pipe->event = pipeEvent;
     pipe->set = setPipe;
     pipe->configure = configureInputOutput;
-    // pipe->data = malloc(sizeof(Node));
-    // pipe->moduleAndPin = malloc(sizeof(ModuleAndPin));
     pipe->data = NULL;
-    // pipe->moduleAndPin->module = NULL;
-    // pipe->moduleAndPin->pin = NULL;
-    // pipe->moduleAndPin->left = NULL;
-    // pipe->moduleAndPin->right = NULL;
     pipe->stateToFire = UNKNOWN;
 
     return pipe;
 }
 
-void pipeEvent(void *pipe, void *node, unsigned long long inputDelay)
+void pipeEvent(void *pipe, void *node, unsigned long long delay)
 {
     Pipe *pipeWithData = (Pipe *)pipe;
     Node *data = (Node *)node;
     ModuleAndPin *moduleAndPin = (ModuleAndPin *)data->dataPtr;
 
     if(data->left != NULL)
-        pipeWithData->event((void *)pipeWithData, (void *)data->left, ONE_NANO_SEC);
+        pipeWithData->event((void *)pipeWithData, (void *)data->left, delay);
+
 
     if(data->right != NULL)
-        pipeWithData->event((void *)pipeWithData, (void *)data->right, ONE_NANO_SEC);
+        pipeWithData->event((void *)pipeWithData, (void *)data->right, delay);
 
-    moduleAndPin->module->set((void *)moduleAndPin, pipeWithData->stateToFire, inputDelay);
+    moduleAndPin->module->set((void *)moduleAndPin, pipeWithData->stateToFire, delay);
 }
 
-void setPipe(void *pipe, int state, unsigned long long inputDelay)
+void setPipe(void *pipe, int state, unsigned long long delay)
 {
     Pipe *pipeWithData = (Pipe *)pipe;
 
     if(pipeWithData->stateToFire != state)
         pipeWithData->stateToFire = state;
 
-    registerEvent(NULL, pipeWithData, inputDelay);
+    registerEvent(NULL, pipeWithData, delay);
 }
 
 void destroyPipe(Pipe *pipe)
 {
     if(pipe != NULL)
-    {
-        // if(pipe->moduleAndPin != NULL)
-            // destroyModuleAndPin(pipe->moduleAndPin);
-
-        // printf("pipe: %p\n", pipe);
-        // destroyNodeDataPtr(pipe->data);
         free(pipe);
-    }
 }
-/*
-void destroyNodeDataPtr(Node *node)
-{
-    if(node != NULL)
-    {
-        if(node->left != NULL)
-            // printf("node->left: %p\n", node->left);
-            destroyNodeDataPtr(node->left);
 
-        if(node->right != NULL)
-            // printf("node->right: %p\n", node->right);
-            destroyNodeDataPtr(node->right);
-
-        // ModuleAndPin *moduleAndPin = (ModuleAndPin *)node->dataPtr;
-        // destroyModuleAndPin(moduleAndPin);
-    }
-} */
-
-// ModuleAndPin *storedModuleAndPin(Module *module, int pinNum)
 void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum)
 {
-    // ModuleAndPin *moduleAndPin;
-
-    // moduleAndPin = malloc(sizeof(ModuleAndPin));
     moduleAndPin->module = module;
     moduleAndPin->pin = &module->pin[pinNum];
-
-    // return moduleAndPin;
 }
-/*
-void destroyModuleAndPin(ModuleAndPin *moduleAndPin)
-{
-    // printf("moduleAndPin: %p\n", moduleAndPin);
-    if(moduleAndPin != NULL)
-        free(moduleAndPin);
-} */
 
+/**
+ *
+ * To configure the output of thisModule to a pipe and pipe to nextModule
+ *
+ */
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData)
 {
     Module *sourceModule = (Module *)thisModule;
@@ -796,8 +768,6 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
     Pin *destPin = (Pin *)toPin;
     Node *newNode = (Node *)pipeData;
     Pipe *pipe;
-    // ModuleAndPin pipeData = {destModule, destPin};
-    // Node newNode;
 
     if(sourcePin->type != OUTPUT_PIN)
         Throw(ERR_NOT_OUT_PIN);
@@ -813,14 +783,15 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
     else
     {
         (destModule->pin[destPin->pinNumber]).pipe = (sourceModule->pin[sourcePin->pinNumber]).pipe;
-        // destPin->state = ((sourceModule->pin[sourcePin->pinNumber]).pipe)->stateToFire;
-        // nextModuleAndPin = createdModuleAndPin(destModule, destPin->pinNumber);
-        // genericResetNode(&newNode, (void *)&pipeData);
-        // setNode(&newNode, NULL, NULL, 'r');
         genericAddRedBlackTree(&((sourceModule->pin[sourcePin->pinNumber]).pipe)->data, newNode, compareModuleAndPin);
     }
 }
 
+/**
+ *
+ * To determine the number of input according to the type of input
+ *
+ */
 int determineNumOfInputPin(int inputType)
 {
      if(inputType == QUAD_2_INPUT || inputType == DUAL_4_INPUT)
@@ -833,6 +804,11 @@ int determineNumOfInputPin(int inputType)
         return 0;
 }
 
+/**
+ *
+ * To determine the number of output according to the type of input
+ *
+ */
 int determineNumOfOutputPin(int inputType)
 {
     if(inputType == QUAD_2_INPUT)
@@ -847,6 +823,12 @@ int determineNumOfOutputPin(int inputType)
         return 0;
 }
 
+/**
+ *
+ * To determine the connection of output according to the Quad 2 input
+ * type of input and return the pin number of output
+ *
+ */
 int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
 {
     if(pinNumber < 2)
@@ -887,6 +869,12 @@ int outputConnectionForQuad2Input(Module *module, int pinNumber, int (*gateFunct
     }
 }
 
+/**
+ *
+ * To determine the connection of output according to the Tri 3 input
+ * type of input and return the pin number of output
+ *
+ */
 int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
 {
     if(pinNumber < 3)
@@ -942,6 +930,12 @@ int outputConnectionForTri3Input(Module *module, int pinNumber, int (*gateFuncti
     }
 }
 
+/**
+ *
+ * To determine the connection of output according to the Dual 4 input
+ * type of input and return the pin number of output
+ *
+ */
 int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber, int inputType))
 {
     if(pinNumber < 4)
@@ -986,6 +980,12 @@ int outputConnectionForDual4Input(Module *module, int pinNumber, int (*gateFunct
     }
 }
 
+/**
+ *
+ * To determine the connection of output according to the Hex Inv
+ * input and return the pin number of output
+ *
+ */
 int outputConnectionForHexInv(Module *module, int pinNumber, int (*gateFunction)(Module *module, int pinNumber))
 {
     int outputPinNumber;
@@ -1016,19 +1016,3 @@ int outputConnectionForHexInv(Module *module, int pinNumber, int (*gateFunction)
 
     return outputPinNumber;
 }
-
-// void pipeAttach(Pipe **pipe, Module **fromModule , void *fromPin, Module *toModule, void *toPin)
-// {
-    // int inPin = (int)toPin;
-    // ModuleAndPin *moduleAndPin = (*pipe)->moduleAndPin;
-
-    // printf("pipe: %p\n", *pipe);
-    // printf("(*pipe)->moduleAndPin: %p\n", (*pipe)->moduleAndPin);
-    // printf("(*pipe)->moduleAndPin->module: %p\n", (*pipe)->moduleAndPin->module);
-    // printf("\n(*pipe)->moduleAndPin->pin: %p\n", (*pipe)->moduleAndPin->pin);
-    // printf("toModule: %p\n", toModule);
-    // printf("toModule->pin[inPin-1]: %p\n", &toModule->pin[inPin-1]);
-    // moduleAndPin->module = toModule;
-    // moduleAndPin->pin = &toModule->pin[inPin-1];
-    // printf("!!!(*pipe)->moduleAndPin->pin: %p\n", (*pipe)->moduleAndPin->pin);
-// }

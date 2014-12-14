@@ -9,10 +9,6 @@
 #include "Rotations.h"
 #include "CException.h"
 
-// #define TIME_1ns 0.0000000001
-// #define TIME_2ns 500000000
-// #define TIME_4ns 250000000
-
 Node            nodeA,          nodeB,          nodeC,          nodeD;
 //                |               |               |               |
 //                v               v               v               v

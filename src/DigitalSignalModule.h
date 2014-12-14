@@ -6,6 +6,12 @@
 #define TOTAL_PIN       14
 #define ONE_PICO_SEC    1
 #define ONE_NANO_SEC    1000 * ONE_PICO_SEC
+#define NAND_PROPAGATION_DELAY  9.5 * ONE_NANO_SEC
+#define NOR_PROPAGATION_DELAY   10 * ONE_NANO_SEC
+#define AND_PROPAGATION_DELAY   9 * ONE_NANO_SEC
+#define OR_PROPAGATION_DELAY    14 * ONE_NANO_SEC
+#define XOR_PROPAGATION_DELAY   10 * ONE_NANO_SEC
+#define NOT_PROPAGATION_DELAY   9.5 * ONE_NANO_SEC
 
 typedef enum {QUAD_2_INPUT, TRI_3_INPUT, DUAL_4_INPUT, HEX_INV} InputType;
 typedef enum {LOW, HIGH, UNKNOWN} State;
@@ -18,15 +24,9 @@ typedef struct Module Module;
 typedef struct Pipe Pipe;
 typedef struct ModuleAndPin ModuleAndPin;
 typedef struct Pin Pin;
-typedef struct Switch Switch;
 
 struct ModuleAndPin
 {
-    /* RBT */
-    // ModuleAndPin *left;
-    // ModuleAndPin *right;
-    // char colour;
-    /* data */
     Module *module;
     Pin *pin;
 };
@@ -40,25 +40,15 @@ struct Pin
     PinType type;
 };
 
-struct Switch
-{
-    void (*event)(void *moduleAndPin);
-    void (*set)(void *moduleAndPin, int state, unsigned long long inputDelay);
-    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
-};
-
 struct Module
 {
     char *name;
-    void (*event)(void *moduleAndPin);
-    // int (*event)(void *object, void *pin);
-    void (*set)(void *moduleAndPin, int state, unsigned long long inputDelay);
-    // void (*set)(void *module, void *pin, int state, unsigned long long inputDelay);
+    void (*event)(void *moduleAndPin, unsigned long long delay);
+    void (*set)(void *moduleAndPin, int state, unsigned long long delay);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
     int typeOfInput;
     int totalPin;
     Pin pin[TOTAL_PIN];
-    // Inbit clk;
 };
 
 struct Pipe
@@ -67,7 +57,6 @@ struct Pipe
     void (*set)(void *pipe, int state, unsigned long long inputDelay);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
     Node *data;
-    // ModuleAndPin *moduleAndPin;
     int stateToFire;
 };
 
@@ -76,11 +65,7 @@ void pipeEvent(void *pipe, void *node, unsigned long long inputDelay);
 void setPipe(void *pipe, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
 
-// void destroyNodeDataPtr(Node *node);
-
 void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum);
-// ModuleAndPin *storedModuleAndPin(Module *module, int pinNum);
-// void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
 Module *createdAndModule(int inputType);
 Module *createdOrModule(int inputType);
@@ -90,32 +75,30 @@ Module *createdNorModule(int inputType);
 Module *createdNotModule(int inputType);
 void destroyModule(Module *module);
 
-void andEvent(void *moduleAndPin);
-void setAnd(void *moduleAndPin, int state, unsigned long long inputDelay);
+void andEvent(void *moduleAndPin, unsigned long long delay);
+void setAnd(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfAND(Module *module, int pinNumber, int inputType);
-// void setAnd(void *module, void *pin, int state, unsigned long long inputDelay);
 
-void orEvent(void *moduleAndPin);
-void setOr(void *moduleAndPin, int state, unsigned long long inputDelay);
+void orEvent(void *moduleAndPin, unsigned long long delay);
+void setOr(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfOR(Module *module, int pinNumber, int inputType);
 
-void xorEvent(void *moduleAndPin);
-void setXor(void *moduleAndPin, int state, unsigned long long inputDelay);
+void xorEvent(void *moduleAndPin, unsigned long long delay);
+void setXor(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfXOR(Module *module, int pinNumber, int inputType);
 
-void nandEvent(void *moduleAndPin);
-void setNand(void *moduleAndPin, int state, unsigned long long inputDelay);
+void nandEvent(void *moduleAndPin, unsigned long long delay);
+void setNand(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfNAND(Module *module, int pinNumber, int inputType);
 
-void norEvent(void *moduleAndPin);
-void setNor(void *moduleAndPin, int state, unsigned long long inputDelay);
+void norEvent(void *moduleAndPin, unsigned long long delay);
+void setNor(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfNOR(Module *module, int pinNumber, int inputType);
 
-void notEvent(void *moduleAndPin);
-void setNot(void *moduleAndPin, int state, unsigned long long inputDelay);
+void notEvent(void *moduleAndPin, unsigned long long delay);
+void setNot(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfNOT(Module *module, int pinNumber);
 
-// Module *configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
 
 // void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);

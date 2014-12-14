@@ -28,3 +28,9 @@ void genericResetNode(Node *target, void *data)
     target->colour = 'b';
     target->dataPtr = data;
 }
+
+void genericSetNode(Node *target, void *data, Node *left, Node *right, char colour)
+{
+    genericResetNode(target, data);
+    setNode(target, left, right, colour);
+}

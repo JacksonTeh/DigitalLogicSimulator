@@ -3,6 +3,7 @@
 #include "DigitalEventSimulator.h"
 #include "RedBlackTree.h"
 #include "InitNode.h"
+#include "CustomAssertions.h"
 
 Node *registerEvent(ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
 {
@@ -11,13 +12,14 @@ Node *registerEvent(ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long e
 
     storedEventTimeData(&eventTime, moduleAndPin, pipe);
 
-    if(moduleAndPin != NULL)
-        eventTime.time = expiredPeriod + determinePropagationDelay(moduleAndPin->module);
-    else
-        eventTime.time = expiredPeriod;
+    // if(moduleAndPin != NULL)
+        // eventTime.time = expiredPeriod + determinePropagationDelay(moduleAndPin->module);
+    // else
+    eventTime.time = expiredPeriod;
 
-    genericResetNode(&newTimeNode, (void *)&eventTime);
-    setNode(&newTimeNode, NULL, NULL, 'r');
+    // genericResetNode(newTimeNode, (void *)&eventTime);
+    // setNode(newTimeNode, NULL, NULL, 'r');
+    genericSetNode(&newTimeNode, (void *)&eventTime, NULL, NULL, 'r');
     genericAddRedBlackTree(&root, &newTimeNode, compareEventTime);
 
     return root;
@@ -29,27 +31,16 @@ void storedEventTimeData(EventTime *eventTime, ModuleAndPin *moduleAndPin, Pipe 
     eventTime->pipe = pipe;
 }
 
-unsigned long long determinePropagationDelay(Module *module)
+int eventSimulator(Node *rootPtr)
 {
-    unsigned long long propagationDelay;
+    Node *removeNode;
 
-    if(!strcmp(module->name, "AND"))
-        propagationDelay = 9 * ONE_NANO_SEC;
-    else if(!strcmp(module->name, "OR"))
-        propagationDelay = 14 * ONE_NANO_SEC;
-    else if(!strcmp(module->name, "XOR"))
-        propagationDelay = 10 * ONE_NANO_SEC;
-    else if(!strcmp(module->name, "NAND"))
-        propagationDelay = 9.5 * ONE_NANO_SEC;
-    else if(!strcmp(module->name, "NOR"))
-        propagationDelay = 10 * ONE_NANO_SEC;
-    else if(!strcmp(module->name, "NOT"))
-        propagationDelay = 9.5 * ONE_NANO_SEC;
+    removeNode = findSmallestTimeEvent(&rootPtr);
 
-    return propagationDelay;
-}
+    if(removeNode == NULL)
+        return 1;
 
-int eventSimulator()
-{
-    
+    EventTime *eventTime = (EventTime *)removeNode->dataPtr;
+    eventTime->moduleAndPin->module->event(eventTime->moduleAndPin, eventTime->time);
+    return 0;
 }
