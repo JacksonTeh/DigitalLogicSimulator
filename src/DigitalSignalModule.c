@@ -3,6 +3,7 @@
 #include "DigitalSignalModule.h"
 #include "RedBlackTree.h"
 #include "InitNode.h"
+#include "Node.h"
 #include "EventInfo.h"
 
 /**
@@ -749,10 +750,42 @@ void destroyPipe(Pipe *pipe)
         free(pipe);
 }
 
+void destroyPipeData(Pipe *pipe)
+{    
+    if(pipe != NULL)
+    {
+        if(pipe->data != NULL)
+        {
+            ModuleAndPin *moduleAndPin = (ModuleAndPin *)pipe->data->dataPtr;
+            destroyModuleAndPin(moduleAndPin);
+            destroyNode(pipe->data);
+        }
+
+        free(pipe);
+    }
+}
+
 void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum)
 {
     moduleAndPin->module = module;
     moduleAndPin->pin = &module->pin[pinNum];
+}
+
+ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
+{
+    ModuleAndPin *moduleAndPin;
+
+    moduleAndPin = malloc(sizeof(ModuleAndPin));
+    moduleAndPin->module = module;
+    moduleAndPin->pin = &module->pin[pinNum];
+
+    return moduleAndPin;
+}
+
+void destroyModuleAndPin(ModuleAndPin *moduleAndPin)
+{
+    if(moduleAndPin != NULL)
+        free(moduleAndPin);
 }
 
 /**
@@ -760,13 +793,14 @@ void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum)
  * To configure the output of thisModule to a pipe and pipe to nextModule
  *
  */
-void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData)
+void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin)
 {
     Module *sourceModule = (Module *)thisModule;
     Module *destModule = (Module *)nextModule;
     Pin *sourcePin = (Pin *)fromPin;
     Pin *destPin = (Pin *)toPin;
-    Node *newNode = (Node *)pipeData;
+    ModuleAndPin *moduleAndPin;
+    Node *newPipeNode;
     Pipe *pipe;
 
     if(sourcePin->type != OUTPUT_PIN)
@@ -783,7 +817,9 @@ void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, voi
     else
     {
         (destModule->pin[destPin->pinNumber]).pipe = (sourceModule->pin[sourcePin->pinNumber]).pipe;
-        genericAddRedBlackTree(&((sourceModule->pin[sourcePin->pinNumber]).pipe)->data, newNode, compareModuleAndPin);
+        moduleAndPin = createdModuleAndPin(destModule, destPin->pinNumber);
+        newPipeNode = createdNewPipeDataNode(moduleAndPin);
+        genericAddRedBlackTree(&((sourceModule->pin[sourcePin->pinNumber]).pipe)->data, newPipeNode, compareModuleAndPin);
     }
 }
 

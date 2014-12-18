@@ -18,7 +18,7 @@ struct Node
     void *dataPtr;
 };
 
-Node *createdNewPipeDataNode();
+Node *createdNewPipeDataNode(ModuleAndPin *moduleAndPin);
 Node *createdNewEventNode(ModuleAndPin *moduleAndPin, Pipe *pipe);
 void destroyEventNode(Node *node);
 void destroyNode(Node *node);

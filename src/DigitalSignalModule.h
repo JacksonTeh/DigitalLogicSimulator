@@ -47,7 +47,7 @@ struct Module
     char *name;
     void (*event)(void *moduleAndPin, unsigned long long delay);
     void (*set)(void *moduleAndPin, int state, unsigned long long delay);
-    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
+    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
     int typeOfInput;
     int totalPin;
     Pin pin[TOTAL_PIN];
@@ -57,7 +57,7 @@ struct Pipe
 {
     void (*event)(void *object, void *node, unsigned long long inputDelay);
     void (*set)(void *pipe, int state, unsigned long long inputDelay);
-    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
+    void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin);
     Node *data;         //data to contain module and pin
     int stateToFire;
 };
@@ -66,8 +66,11 @@ Pipe *createdPipeModule();
 void pipeEvent(void *pipe, void *node, unsigned long long inputDelay);
 void setPipe(void *pipe, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
+void destroyPipeData(Pipe *pipe);
 
 void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum);
+ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
+void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
 Module *createdAndModule(int inputType);
 Module *createdOrModule(int inputType);
@@ -101,7 +104,7 @@ void notEvent(void *moduleAndPin, unsigned long long delay);
 void setNot(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfNOT(Module *module, int pinNumber);
 
-void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
+void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
 
 // void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);
 

@@ -7,6 +7,7 @@
 #include "mock_DigitalEventSimulator.h"
 #include "mock_RedBlackTree.h"
 #include "Rotations.h"
+#include "Node.h"
 #include "EventInfo.h"
 
 void setUp(void)
@@ -605,7 +606,7 @@ void test_createdPipeModule_should_create_module_for_pipe(void)
 
     destroyPipe(pipe);
 }
-
+/*
 void test_configureInputOutput_given_invalid_output_pin_for_OR_module_should_throw_ERR_NOT_OUT_PIN(void)
 {
     CEXCEPTION_T err;
@@ -692,7 +693,7 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     destroyModule(AND);
     destroyModule(OR);
 }
-/* 
+ 
 void test_setAnd_given_AND_module_should_set_input_of_AND_module_and_register_event(void)
 {
     Module *AND;

@@ -3,9 +3,17 @@
 #include "Node.h"
 #include "EventInfo.h"
 
-Node *createdNewPipeDataNode()
+Node *createdNewPipeDataNode(ModuleAndPin *moduleAndPin)
 {
+    Node *newNode;
 
+    newNode = malloc(sizeof(Node));
+    newNode->dataPtr = moduleAndPin;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    newNode->colour = 'r';
+
+    return newNode;
 }
 
 Node *createdNewEventNode(ModuleAndPin *moduleAndPin, Pipe *pipe)
