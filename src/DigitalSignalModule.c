@@ -3,7 +3,7 @@
 #include "DigitalSignalModule.h"
 #include "RedBlackTree.h"
 #include "InitNode.h"
-#include "EventTime.h"
+#include "EventInfo.h"
 
 /**
  * Series No.   Description                 Delay, tpd

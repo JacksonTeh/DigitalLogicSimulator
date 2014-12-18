@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "Node.h"
+#include "EventInfo.h"
 #include "Rotations.h"
 #include "InitNode.h"
 

@@ -16,9 +16,9 @@ void resetNode(Node *target, int data)
     target->data = data;
 }
 
-void setEventTime(EventTime *time, long long data)
+void setEventInfo(EventInfo *eventInfo, unsigned long long data)
 {
-    time->time = data;
+    eventInfo->time = data;
 }
 
 void genericResetNode(Node *target, void *data)

@@ -2,6 +2,10 @@
 #include "RedBlackTree.h"
 #include "Rotations.h"
 #include "ErrorCode.h"
+#include "Node.h"
+#include "EventInfo.h"
+#include "DigitalSignalModule.h"
+#include "EventInfo.h"
 
 void _genericAddRedBlackTree(Node **rootPtr, Node *newNode, int (*compareNode)(void *node, void *target));
 Node *_genericDelRedBlackTree(Node **rootPtr, Node *delNode, int (*compareNode)(void *node, void *target));
@@ -22,13 +26,13 @@ int compareModuleAndPin(void *rootPtr, void *newNode)
         return 1;
 }
 
-int compareEventTime(void *rootPtr, void *newNode)
+int compareEventInfo(void *rootPtr, void *newNode)
 {
     Node *root = (Node *)rootPtr;
     Node *new = (Node *)newNode;
 
-    EventTime *rootNode = (EventTime *)root->dataPtr;
-    EventTime *newTime = (EventTime *)new->dataPtr;
+    EventInfo *rootNode = (EventInfo *)root->dataPtr;
+    EventInfo *newTime = (EventInfo *)new->dataPtr;
 
     if(rootNode->time == newTime->time)
         return -1;

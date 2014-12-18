@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "unity.h"
 #include "ErrorCode.h"
+#include "Node.h"
+#include "EventInfo.h"
 #include "DigitalSignalModule.h"
 #include "DigitalEventSimulator.h"
 #include "RedBlackTree.h"
@@ -17,7 +19,7 @@ ModuleAndPin moduleAndPin_1, moduleAndPin_2, moduleAndPin_3, moduleAndPin_4;    
 Node       node1,    node2,    node4;
 //           |         |         |
 //           v         v         v
-EventTime time_1ns, time_2ns, time_4ns;    //dataPtr
+EventInfo time_1ns, time_2ns, time_4ns;    //dataPtr
 
 void setUp(void)
 {
@@ -26,9 +28,9 @@ void setUp(void)
     genericResetNode(&nodeC, (void *)&moduleAndPin_3);
     genericResetNode(&nodeD, (void *)&moduleAndPin_4);
 
-    setEventTime(&time_1ns, 1);
-    setEventTime(&time_2ns, 2);
-    setEventTime(&time_4ns, 4);
+    setEventInfo(&time_1ns, 1);
+    setEventInfo(&time_2ns, 2);
+    setEventInfo(&time_4ns, 4);
     genericResetNode(&node1, (void *)&time_1ns);
     genericResetNode(&node2, (void *)&time_2ns);
     genericResetNode(&node4, (void *)&time_4ns);
@@ -50,7 +52,7 @@ void test_genericDelRedBlackTree_remove_node2_from_tree_with_only_node1_should_t
     CEXCEPTION_T err;
 
     Try{
-        genericDelRedBlackTree(&root, &node2, compareEventTime);
+        genericDelRedBlackTree(&root, &node2, compareEventInfo);
         TEST_FAIL_MESSAGE("Expected ERR_NODE_UNAVAILABLE to be thrown. But receive none");
     } Catch(err)
     {
@@ -67,7 +69,7 @@ void test_genericDelRedBlackTree_remove_node2_from_tree_with_only_node2(void)
     setNode(&node2, NULL, NULL, 'b');
     Node *root = &node2, *removeNode;
 
-    removeNode = genericDelRedBlackTree(&root, &node2, compareEventTime);
+    removeNode = genericDelRedBlackTree(&root, &node2, compareEventInfo);
 
     TEST_ASSERT_EQUAL_PTR(NULL, root);
     TEST_ASSERT_EQUAL_PTR(&node2, removeNode);
@@ -85,7 +87,7 @@ void test_genericDelRedBlackTree_remove_node1_from_tree_with_node_1_2(void)
     setNode(&node2, &node1, NULL, 'b');
     Node *root = &node2, *removeNode;
 
-    removeNode = genericDelRedBlackTree(&root, &node1, compareEventTime);
+    removeNode = genericDelRedBlackTree(&root, &node1, compareEventInfo);
 
     TEST_ASSERT_EQUAL_PTR(&node2, root);
     TEST_ASSERT_EQUAL_PTR(&node1, removeNode);
@@ -104,7 +106,7 @@ void test_genericDelRedBlackTree_remove_node2_from_tree_with_node_2_4(void)
     setNode(&node2, NULL, &node4, 'b');
     Node *root = &node2, *removeNode;
 
-    removeNode = genericDelRedBlackTree(&root, &node2, compareEventTime);
+    removeNode = genericDelRedBlackTree(&root, &node2, compareEventInfo);
 
     TEST_ASSERT_EQUAL_PTR(&node4, root);
     TEST_ASSERT_EQUAL_PTR(&node2, removeNode);

@@ -2,11 +2,9 @@
 #define RedBlackTree_H
 
 #include "Node.h"
-#include "DigitalSignalModule.h"
-#include "EventTime.h"
 
 int compareModuleAndPin(void *rootPtr, void *newNode);
-int compareEventTime(void *rootPtr, void *newNode);
+int compareEventInfo(void *rootPtr, void *newNode);
 
 void genericAddRedBlackTree(Node **rootPtr, Node *newNode, int (*compareNode)(void *node, void *target));
 Node *genericDelRedBlackTree(Node **rootPtr, Node *delNode, int (*compareNode)(void *node, void *target));

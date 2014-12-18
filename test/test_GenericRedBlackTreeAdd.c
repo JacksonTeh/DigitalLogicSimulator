@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "unity.h"
 #include "ErrorCode.h"
+#include "Node.h"
+#include "EventInfo.h"
 #include "DigitalSignalModule.h"
 #include "DigitalEventSimulator.h"
 #include "RedBlackTree.h"
@@ -15,7 +17,7 @@ ModuleAndPin moduleAndPin[4];   //dataPtr
 Node       node1,    node2,    node4;
 //           |         |         |
 //           v         v         v
-EventTime time_1ns, time_2ns, time_4ns;    //dataPtr
+EventInfo time_1ns, time_2ns, time_4ns;    //dataPtr
 
 void setUp(void)
 {
@@ -24,9 +26,9 @@ void setUp(void)
     genericResetNode(&nodeC, (void *)&moduleAndPin[2]);
     genericResetNode(&nodeD, (void *)&moduleAndPin[3]);
 
-    setEventTime(&time_1ns, ONE_NANO_SEC);
-    setEventTime(&time_2ns, 2 * ONE_NANO_SEC);
-    setEventTime(&time_4ns, 4 * ONE_NANO_SEC);
+    setEventInfo(&time_1ns, ONE_NANO_SEC);
+    setEventInfo(&time_2ns, 2 * ONE_NANO_SEC);
+    setEventInfo(&time_4ns, 4 * ONE_NANO_SEC);
     genericResetNode(&node1, (void *)&time_1ns);
     genericResetNode(&node2, (void *)&time_2ns);
     genericResetNode(&node4, (void *)&time_4ns);
@@ -121,19 +123,19 @@ void test_genericAddRedBlackTree_add_nodeD_to_tree_with_only_nodeC(void)
     TEST_ASSERT_EQUAL_NODE(NULL, &nodeD, 'b', &nodeC);
 }
 
-void test_compareEventTime_given_node1_and_node1_as_newNode_should_return_negative_1(void)
+void test_compareEventInfo_given_node1_and_node1_as_newNode_should_return_negative_1(void)
 {
-    TEST_ASSERT_EQUAL(-1, compareEventTime((void *)&node1, (void *)&node1));
+    TEST_ASSERT_EQUAL(-1, compareEventInfo((void *)&node1, (void *)&node1));
 }
 
-void test_compareEventTime_given_node2_and_node1_as_newNode_should_return_0(void)
+void test_compareEventInfo_given_node2_and_node1_as_newNode_should_return_0(void)
 {
-    TEST_ASSERT_EQUAL(0, compareEventTime((void *)&node2, (void *)&node1));
+    TEST_ASSERT_EQUAL(0, compareEventInfo((void *)&node2, (void *)&node1));
 }
 
-void test_compareEventTime_given_node1_and_node2_as_newNode_should_return_1(void)
+void test_compareEventInfo_given_node1_and_node2_as_newNode_should_return_1(void)
 {
-    TEST_ASSERT_EQUAL(1, compareEventTime((void *)&node1, (void *)&node2));
+    TEST_ASSERT_EQUAL(1, compareEventInfo((void *)&node1, (void *)&node2));
 }
 
 /** 2-node case
@@ -145,7 +147,7 @@ void test_genericAddRedBlackTree_add_node1_to_empty_tree(void)
     setNode(&node1, NULL, NULL, 'r');
     Node *root = NULL;
 
-    genericAddRedBlackTree(&root, &node1, compareEventTime);
+    genericAddRedBlackTree(&root, &node1, compareEventInfo);
 
     TEST_ASSERT_EQUAL_PTR(&node1, root);
     TEST_ASSERT_EQUAL_NODE(NULL, NULL, 'b', &node1);
@@ -162,7 +164,7 @@ void test_genericAddRedBlackTree_add_node1_to_tree_with_only_node1_should_throw_
     CEXCEPTION_T err;
 
     Try{
-        genericAddRedBlackTree(&root, &node1, compareEventTime);
+        genericAddRedBlackTree(&root, &node1, compareEventInfo);
         TEST_FAIL_MESSAGE("Expected ERR_EQUIVALENT_NODE to be thrown. But receive none");
     } Catch(err)
     {
@@ -181,7 +183,7 @@ void test_genericAddRedBlackTree_add_node1_to_tree_with_only_node2(void)
     setNode(&node2, NULL, NULL, 'b');
     Node *root = &node2;
 
-    genericAddRedBlackTree(&root, &node1, compareEventTime);
+    genericAddRedBlackTree(&root, &node1, compareEventInfo);
 
     TEST_ASSERT_EQUAL_PTR(&node2, root);
     TEST_ASSERT_EQUAL_NODE(NULL, NULL, 'r', &node1);
@@ -199,7 +201,7 @@ void test_genericAddRedBlackTree_add_node4_to_tree_with_only_node2(void)
     setNode(&node2, NULL, NULL, 'b');
     Node *root = &node2;
 
-    genericAddRedBlackTree(&root, &node4, compareEventTime);
+    genericAddRedBlackTree(&root, &node4, compareEventInfo);
 
     TEST_ASSERT_EQUAL_PTR(&node2, root);
     TEST_ASSERT_EQUAL_NODE(NULL, NULL, 'r', &node4);

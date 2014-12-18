@@ -1,7 +1,13 @@
 #ifndef Node_H
 #define Node_H
 
+// #include "DigitalSignalModule.h"
+// #include "EventTime.h"
+
 typedef struct Node Node;
+
+// #include "EventTime.h"
+#include "DigitalSignalModule.h"
 
 struct Node
 {
@@ -11,5 +17,10 @@ struct Node
     int data;
     void *dataPtr;
 };
+
+Node *createdNewPipeDataNode();
+Node *createdNewEventNode(ModuleAndPin *moduleAndPin, Pipe *pipe);
+void destroyEventNode(Node *node);
+void destroyNode(Node *node);
 
 #endif // Node_H

@@ -1,7 +1,7 @@
 #ifndef DigitalSignalModule_H
 #define DigitalSignalModule_H
 
-#include "Node.h"
+// #include "Node.h"
 
 #define TOTAL_PIN       14
 #define ONE_PICO_SEC    1
@@ -24,6 +24,8 @@ typedef struct Module Module;
 typedef struct Pipe Pipe;
 typedef struct ModuleAndPin ModuleAndPin;
 typedef struct Pin Pin;
+
+#include "Node.h"
 
 struct ModuleAndPin
 {
@@ -56,7 +58,7 @@ struct Pipe
     void (*event)(void *object, void *node, unsigned long long inputDelay);
     void (*set)(void *pipe, int state, unsigned long long inputDelay);
     void (*configure)(void *thisModule, void *fromPin, void *nextModule, void *toPin, void *pipeData);
-    Node *data;
+    Node *data;         //data to contain module and pin
     int stateToFire;
 };
 

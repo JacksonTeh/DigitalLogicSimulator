@@ -7,7 +7,7 @@
 #include "mock_DigitalEventSimulator.h"
 #include "mock_RedBlackTree.h"
 #include "Rotations.h"
-#include "EventTime.h"
+#include "EventInfo.h"
 
 void setUp(void)
 {
@@ -692,18 +692,17 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     destroyModule(AND);
     destroyModule(OR);
 }
-
+/* 
 void test_setAnd_given_AND_module_should_set_input_of_AND_module_and_register_event(void)
 {
     Module *AND;
     ModuleAndPin moduleAndPin;
-    Node testNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
     storedModuleAndPin(&moduleAndPin, AND, (AND->pin[0]).pinNumber);
 
-    registerEvent_ExpectAndReturn(&moduleAndPin, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY, &testNode);
+    registerEvent_Expect(&moduleAndPin, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
 
     AND->set((void *)&moduleAndPin, HIGH, ONE_NANO_SEC);
 
@@ -798,7 +797,6 @@ void test_andEvent_given_AND_with_QUAD_2_INPUT_and_connected_to_pipe_should_regi
     Module *AND, *module;
     ModuleAndPin moduleAndPin;
     Pipe *pipe;
-    Node testNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -808,7 +806,7 @@ void test_andEvent_given_AND_with_QUAD_2_INPUT_and_connected_to_pipe_should_regi
     AND->pin[11].pipe = pipe;
     storedModuleAndPin(&moduleAndPin, AND, (AND->pin[6]).pinNumber);
 
-    registerEvent_ExpectAndReturn(NULL, pipe, ONE_NANO_SEC, &testNode);
+    registerEvent_Expect(NULL, pipe, ONE_NANO_SEC);
 
     AND->event((void *)&moduleAndPin, ONE_NANO_SEC);
     module = moduleAndPin.module;
@@ -1324,13 +1322,13 @@ void test_outputConnectionForHexInv_given_pin_5_should_return_11(void)
 void test_setPipe_given_pipe_should_register_event_for_pipe(void)
 {
     Pipe *pipe;
-    Node newNode, testNode;
+    Node newNode;
     int inputType = QUAD_2_INPUT;
 
     pipe = createdPipeModule();
     pipe->stateToFire = LOW;
 
-    registerEvent_ExpectAndReturn(NULL, pipe, ONE_NANO_SEC, &testNode);
+    registerEvent_Expect(NULL, pipe, ONE_NANO_SEC);
 
     pipe->set((void *)pipe, HIGH, ONE_NANO_SEC);
 
@@ -1344,7 +1342,7 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     Module *AND;
     ModuleAndPin pipeData;
     Pipe *pipe;
-    Node newNode, node;
+    Node newNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -1355,7 +1353,7 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     genericSetNode(&newNode, (void *)&pipeData, NULL, NULL, 'r');
     pipe->data = &newNode;
 
-    registerEvent_ExpectAndReturn(&pipeData, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY, &node);
+    registerEvent_Expect(&pipeData, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
 
     pipe->event((void *)pipe, (void *)pipe->data, ONE_NANO_SEC);
 
@@ -1370,7 +1368,7 @@ void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event
     Module *AND, *OR;
     ModuleAndPin andData, orData;
     Pipe *pipe;
-    Node andRootNode, orNode, node;
+    Node andRootNode, orNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -1384,8 +1382,8 @@ void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event
     genericSetNode(&andRootNode, (void *)&andData, &orNode, NULL, 'b');
     pipe->data = &andRootNode;
 
-    registerEvent_ExpectAndReturn(&orData, NULL, ONE_NANO_SEC + OR_PROPAGATION_DELAY, &node);
-    registerEvent_ExpectAndReturn(&andData, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY, &node);
+    registerEvent_Expect(&orData, NULL, ONE_NANO_SEC + OR_PROPAGATION_DELAY);
+    registerEvent_Expect(&andData, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
 
     pipe->event((void *)pipe, (void *)pipe->data, ONE_NANO_SEC);
 
@@ -1402,7 +1400,7 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     Module *AND1, *AND2, *OR;
     ModuleAndPin andData1, andData2, orData;
     Pipe *pipe;
-    Node and1RootNode, and2Node, orNode, node;
+    Node and1RootNode, and2Node, orNode;
     int inputType = QUAD_2_INPUT;
 
     AND1 = createdAndModule(inputType);
@@ -1419,9 +1417,9 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     genericSetNode(&and1RootNode, (void *)&andData1, &orNode, &and2Node, 'b');
     pipe->data = &and1RootNode;
 
-    registerEvent_ExpectAndReturn(&orData, NULL, ONE_NANO_SEC + OR_PROPAGATION_DELAY, &node);
-    registerEvent_ExpectAndReturn(&andData2, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY, &node);
-    registerEvent_ExpectAndReturn(&andData1, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY, &node);
+    registerEvent_Expect(&orData, NULL, ONE_NANO_SEC + OR_PROPAGATION_DELAY);
+    registerEvent_Expect(&andData2, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
+    registerEvent_Expect(&andData1, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
 
     pipe->event((void *)pipe, (void *)pipe->data, ONE_NANO_SEC);
 
@@ -1433,4 +1431,4 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     destroyModule(AND2);
     destroyModule(AND1);
     destroyPipe(pipe);
-}
+} */
