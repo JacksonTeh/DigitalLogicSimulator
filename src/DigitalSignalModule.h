@@ -68,7 +68,7 @@ void setPipe(void *pipe, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
 void destroyPipeData(Pipe *pipe);
 
-void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum);
+// void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum);
 ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 

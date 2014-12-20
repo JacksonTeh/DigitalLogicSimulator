@@ -9,8 +9,11 @@
 #include "EventInfo.h"
 #include "Node.h"
 
+extern Node *eventRoot;
+
 void setUp(void)
 {
+    eventRoot = NULL;
 }
 
 void tearDown(void)
@@ -42,7 +45,7 @@ void test_registerEvent_given_AND_module_and_pin_should_register_the_event_to_re
     Module *AND;
     ModuleAndPin *moduleAndPin;
     EventInfo *eventInfo;
-    Node *root = NULL;
+    // Node *root = NULL;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -51,26 +54,32 @@ void test_registerEvent_given_AND_module_and_pin_should_register_the_event_to_re
     // genericAddRedBlackTree_Expect(&root, &newNode, compareEventInfo);
 
     // root = registerEvent(&moduleAndPin, NULL, ONE_NANO_SEC);
-    registerEvent(&root, moduleAndPin, NULL, ONE_NANO_SEC);
-    eventInfo = (EventInfo *)root->dataPtr;
+    // registerEvent(&root, moduleAndPin, NULL, ONE_NANO_SEC);
+    registerEvent(moduleAndPin, NULL, ONE_NANO_SEC);
+    // eventInfo = (EventInfo *)root->dataPtr;
+    eventInfo = (EventInfo *)eventRoot->dataPtr;
 
-    TEST_ASSERT_NOT_NULL(root);
-    TEST_ASSERT_NULL(root->left);
-    TEST_ASSERT_NULL(root->right);
+    // TEST_ASSERT_NOT_NULL(root);
+    TEST_ASSERT_NOT_NULL(eventRoot);
+    // TEST_ASSERT_NULL(root->left);
+    TEST_ASSERT_NULL(eventRoot->left);
+    // TEST_ASSERT_NULL(root->right);
+    TEST_ASSERT_NULL(eventRoot->right);
     TEST_ASSERT_EQUAL_PTR(ONE_NANO_SEC, eventInfo->time);
     TEST_ASSERT_NULL(eventInfo->pipe);
     TEST_ASSERT_EQUAL_PTR(moduleAndPin, eventInfo->moduleAndPin);
 
     destroyModuleAndPin(moduleAndPin);
     destroyModule(AND);
-    destroyEventNode(root);
+    // destroyEventNode(root);
+    destroyEventNode(eventRoot);
 }
 
 void test_registerEvent_given_pipe_should_register_the_event_to_red_black_tree(void)
 {
     Pipe *pipe;
     EventInfo *eventInfo;
-    Node *root = NULL;
+    // Node *root = NULL;
     int inputType = QUAD_2_INPUT;
 
     pipe = createdPipeModule();
@@ -78,48 +87,87 @@ void test_registerEvent_given_pipe_should_register_the_event_to_red_black_tree(v
     // genericAddRedBlackTree_Expect(&root, &newNode, compareEventInfo);
 
     // root = registerEvent(&moduleAndPin, NULL, ONE_NANO_SEC);
-    registerEvent(&root, NULL, pipe, ONE_NANO_SEC);
-    eventInfo = (EventInfo *)root->dataPtr;
+    // registerEvent(&root, NULL, pipe, ONE_NANO_SEC);
+    registerEvent(NULL, pipe, ONE_NANO_SEC);
+    // eventInfo = (EventInfo *)root->dataPtr;
+    eventInfo = (EventInfo *)eventRoot->dataPtr;
 
-    TEST_ASSERT_NOT_NULL(root);
-    TEST_ASSERT_NULL(root->left);
-    TEST_ASSERT_NULL(root->right);
+    TEST_ASSERT_NOT_NULL(eventRoot);
+    TEST_ASSERT_NULL(eventRoot->left);
+    TEST_ASSERT_NULL(eventRoot->right);
     TEST_ASSERT_EQUAL_PTR(ONE_NANO_SEC, eventInfo->time);
     TEST_ASSERT_EQUAL_PTR(pipe, eventInfo->pipe);
     TEST_ASSERT_NULL(eventInfo->moduleAndPin);
 
-    destroyEventNode(root);
+    destroyEventNode(eventRoot);
 }
 
 void test_eventSimulator_given_NULL_node_should_return_1(void)
 {
-    Node *root = NULL;
+    // Node *root = NULL;
 
     // removeNextLargerSuccessor_ExpectAndReturn(&root, newNode);
 
-    TEST_ASSERT_EQUAL(1, eventSimulator(root));
+    TEST_ASSERT_EQUAL(1, eventSimulator());
 }
 
 void test_eventSimulator_given_node_contain_AND_module_and_pin_should_return_0_and_generate_event_for_AND(void)
 {
-    Node *root;
+    // Node *root;
     Module *AND;
     ModuleAndPin *moduleAndPin;
-    EventInfo eventInfo;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
     (AND->pin[0]).state = HIGH;
     (AND->pin[1]).state = HIGH;
     moduleAndPin = createdModuleAndPin(AND, AND->pin[0].pinNumber);
-    root = createdNewEventNode(moduleAndPin, NULL);
+    eventRoot = createdNewEventNode(moduleAndPin, NULL);
 
     // removeNextLargerSuccessor_ExpectAndReturn(&rootPtr, newNode);
 
-    TEST_ASSERT_EQUAL(0, eventSimulator(root));
+    TEST_ASSERT_EQUAL(0, eventSimulator());
     TEST_ASSERT_EQUAL(HIGH, (AND->pin[8]).state);
+    TEST_ASSERT_NULL(eventRoot);
 
     destroyModuleAndPin(moduleAndPin);
     destroyModule(AND);
-    destroyEventNode(root);
+    destroyEventNode(eventRoot);
+}
+
+void xtest_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_return_0_and_generate_event_for_pipe(void)
+{
+    Module *AND;
+    ModuleAndPin *moduleAndPin, *result;
+    Pipe *pipe;
+    Node newNode;
+    EventInfo *eventInfo;
+    int inputType = QUAD_2_INPUT;
+
+    AND = createdAndModule(inputType);
+    (AND->pin[1]).state = HIGH;
+    pipe = createdPipeModule();
+    pipe->stateToFire = HIGH;
+    moduleAndPin = createdModuleAndPin(AND, AND->pin[0].pinNumber);
+    genericSetNode(&newNode, (void *)moduleAndPin, NULL, NULL, 'r');
+    pipe->data = &newNode;
+    eventRoot = createdNewEventNode(NULL, pipe);
+    eventInfo = (EventInfo *)eventRoot->dataPtr;
+    eventInfo->time = ONE_NANO_SEC;
+
+    // removeNextLargerSuccessor_ExpectAndReturn(&rootPtr, newNode);
+
+    TEST_ASSERT_EQUAL(0, eventSimulator());
+
+    result = (ModuleAndPin *)eventRoot->dataPtr;
+
+    TEST_ASSERT_NOT_NULL(eventRoot);
+    TEST_ASSERT_NOT_NULL(result);
+    TEST_ASSERT_EQUAL_PTR(AND, result->module);
+    TEST_ASSERT_EQUAL_PTR(&AND->pin[0], result->pin);
+
+    // destroyModuleAndPin(moduleAndPin);
+    destroyPipeData(pipe);
+    destroyModule(AND);
+    destroyEventNode(eventRoot);
 }

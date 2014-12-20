@@ -28,6 +28,8 @@
  * ========================================================
  */
 
+Node *eventRoot;
+
 /**
  * ========================
  * |       AND Gate       |
@@ -697,7 +699,8 @@ void destroyModule(Module *module)
         for(i = 0; i < TOTAL_PIN; i++)
         {
             if((module->pin[i]).type == OUTPUT_PIN)
-                destroyPipe((module->pin[i]).pipe);
+                // destroyPipe((module->pin[i]).pipe);
+                destroyPipeData((module->pin[i]).pipe);
         }
 
         free(module);
@@ -744,14 +747,14 @@ void setPipe(void *pipe, int state, unsigned long long delay)
     registerEvent(NULL, pipeWithData, delay);
 }
 
-void destroyPipe(Pipe *pipe)
-{
-    if(pipe != NULL)
-        free(pipe);
-}
+// void destroyPipe(Pipe *pipe)
+// {
+    // if(pipe != NULL)
+        // free(pipe);
+// }
 
 void destroyPipeData(Pipe *pipe)
-{    
+{
     if(pipe != NULL)
     {
         if(pipe->data != NULL)
@@ -765,11 +768,11 @@ void destroyPipeData(Pipe *pipe)
     }
 }
 
-void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum)
-{
-    moduleAndPin->module = module;
-    moduleAndPin->pin = &module->pin[pinNum];
-}
+// void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum)
+// {
+    // moduleAndPin->module = module;
+    // moduleAndPin->pin = &module->pin[pinNum];
+// }
 
 ModuleAndPin *createdModuleAndPin(Module *module, int pinNum)
 {

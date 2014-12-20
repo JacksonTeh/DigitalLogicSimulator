@@ -8,8 +8,11 @@
 #include "EventInfo.h"
 #include "Node.h"
 
+extern Node *eventRoot;
+
 // Node *registerEvent(ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
-void registerEvent(Node **eventRoot, ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
+// void registerEvent(Node **eventRoot, ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
+void registerEvent(ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
 {
     EventInfo *eventInfo;
     Node *newEventNode;
@@ -18,8 +21,8 @@ void registerEvent(Node **eventRoot, ModuleAndPin *moduleAndPin, Pipe *pipe, uns
     newEventNode = createdNewEventNode(moduleAndPin, pipe);
     eventInfo = (EventInfo *)newEventNode->dataPtr;
     eventInfo->time = expiredPeriod;
-    
-    genericAddRedBlackTree(eventRoot, newEventNode, compareEventInfo);
+
+    genericAddRedBlackTree(&eventRoot, newEventNode, compareEventInfo);
 
     // assert(eventRoot != NULL);
     // assert(root->dataPtr != NULL);
@@ -32,7 +35,8 @@ void registerEvent(Node **eventRoot, ModuleAndPin *moduleAndPin, Pipe *pipe, uns
     // eventInfo->pipe = pipe;
 // }
 
-int eventSimulator(Node *eventRoot)
+// int eventSimulator(Node *eventRoot)
+int eventSimulator()
 {
     Node *removeNode;
 
@@ -42,6 +46,11 @@ int eventSimulator(Node *eventRoot)
         return 1;
 
     EventInfo *eventInfo = (EventInfo *)removeNode->dataPtr;
-    eventInfo->moduleAndPin->module->event(eventInfo->moduleAndPin, eventInfo->time);
+
+    if(eventInfo->pipe == NULL)
+        eventInfo->moduleAndPin->module->event(eventInfo->moduleAndPin, eventInfo->time);
+    else
+        eventInfo->pipe->event(eventInfo->pipe, eventInfo->pipe->data, eventInfo->time);
+
     return 0;
 }
