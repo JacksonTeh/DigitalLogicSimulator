@@ -14,6 +14,7 @@ extern Node *eventRoot;
 
 void setUp(void)
 {
+    eventRoot = NULL;
 }
 
 void tearDown(void)
@@ -1360,7 +1361,7 @@ void test_setPipe_given_pipe_should_register_event_for_pipe(void)
 
     destroyPipeData(pipe);
 }
-
+/* 
 void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pipe_data(void)
 {
     Module *AND;
@@ -1462,3 +1463,4 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     destroyModule(AND1);
     destroyPipeData(pipe);
 }
+ */
