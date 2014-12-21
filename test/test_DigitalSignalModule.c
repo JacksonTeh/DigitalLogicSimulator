@@ -1388,7 +1388,7 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     destroyModule(AND);
     destroyPipeData(pipe);
 }
-
+/* 
 void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event_for_all_pipe_data(void)
 {
     Module *AND, *OR;
@@ -1463,3 +1463,4 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     destroyModule(AND1);
     destroyPipeData(pipe);
 }
+ */
