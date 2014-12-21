@@ -34,6 +34,11 @@ void destroyEventNode(Node *node)
 {
     if(node != NULL)
     {
+        if(node->left != NULL)
+            destroyEventNode(node->left);
+        else if(node->right != NULL)
+            destroyEventNode(node->right);
+
         if(node->dataPtr != NULL)
             destroyEventInfo((EventInfo *)node->dataPtr);
 
@@ -44,5 +49,12 @@ void destroyEventNode(Node *node)
 void destroyNode(Node *node)
 {
     if(node != NULL)
+    {
+        if(node->left != NULL)
+            destroyEventNode(node->left);
+        else if(node->right != NULL)
+            destroyEventNode(node->right);
+
         free(node);
+    }
 }

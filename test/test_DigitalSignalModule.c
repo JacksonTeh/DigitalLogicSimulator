@@ -1389,13 +1389,13 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     destroyModule(AND);
     destroyPipeData(pipe);
 }
-/* 
+
 void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event_for_all_pipe_data(void)
 {
     Module *AND, *OR;
     ModuleAndPin *andData, *orData;
     Pipe *pipe;
-    Node andRootNode, orNode;
+    Node *andRootNode, *orNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -1407,9 +1407,12 @@ void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event
     andData = createdModuleAndPin(AND, (AND->pin[0]).pinNumber);
     orData = createdModuleAndPin(OR, (OR->pin[1]).pinNumber);
 
-    genericSetNode(&orNode, (void *)orData, NULL, NULL, 'r');
-    genericSetNode(&andRootNode, (void *)andData, &orNode, NULL, 'b');
-    pipe->data = &andRootNode;
+    // genericSetNode(&orNode, (void *)orData, NULL, NULL, 'r');
+    // genericSetNode(&andRootNode, (void *)andData, &orNode, NULL, 'b');
+    andRootNode = createdNewPipeDataNode(andData);
+    orNode = createdNewPipeDataNode(orData);
+    setNode(andRootNode, orNode, NULL, 'b');
+    pipe->data = andRootNode;
 
     registerEvent_Expect(orData, NULL, ONE_NANO_SEC + OR_PROPAGATION_DELAY);
     registerEvent_Expect(andData, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
@@ -1429,7 +1432,7 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     Module *AND1, *AND2, *OR;
     ModuleAndPin *andData1, *andData2, *orData;
     Pipe *pipe;
-    Node and1RootNode, and2Node, orNode;
+    Node *and1RootNode, *and2Node, *orNode;
     int inputType = QUAD_2_INPUT;
 
     AND1 = createdAndModule(inputType);
@@ -1444,10 +1447,14 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     // storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
     orData = createdModuleAndPin(OR, (OR->pin[1]).pinNumber);
 
-    genericSetNode(&orNode, (void *)orData, NULL, NULL, 'r');
-    genericSetNode(&and2Node, (void *)andData2, NULL, NULL, 'r');
-    genericSetNode(&and1RootNode, (void *)andData1, &orNode, &and2Node, 'b');
-    pipe->data = &and1RootNode;
+    // genericSetNode(&orNode, (void *)orData, NULL, NULL, 'r');
+    // genericSetNode(&and2Node, (void *)andData2, NULL, NULL, 'r');
+    // genericSetNode(&and1RootNode, (void *)andData1, &orNode, &and2Node, 'b');
+    and1RootNode = createdNewPipeDataNode(andData1);
+    and2Node = createdNewPipeDataNode(andData2);
+    orNode = createdNewPipeDataNode(orData);
+    setNode(and1RootNode, orNode, and2Node, 'b');
+    pipe->data = and1RootNode;
 
     registerEvent_Expect(orData, NULL, ONE_NANO_SEC + OR_PROPAGATION_DELAY);
     registerEvent_Expect(andData2, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
@@ -1464,4 +1471,3 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     destroyModule(AND1);
     destroyPipeData(pipe);
 }
- */
