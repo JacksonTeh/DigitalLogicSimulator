@@ -1367,7 +1367,7 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     Module *AND;
     ModuleAndPin *pipeData;
     Pipe *pipe;
-    Node newNode;
+    Node *newNode;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -1376,8 +1376,9 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     // storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
     pipeData = createdModuleAndPin(AND, (AND->pin[0]).pinNumber);
 
-    genericSetNode(&newNode, (void *)pipeData, NULL, NULL, 'r');
-    pipe->data = &newNode;
+    // genericSetNode(&newNode, (void *)pipeData, NULL, NULL, 'r');
+    newNode = createdNewPipeDataNode(pipeData);
+    pipe->data = newNode;
 
     registerEvent_Expect(pipeData, NULL, ONE_NANO_SEC + AND_PROPAGATION_DELAY);
 
