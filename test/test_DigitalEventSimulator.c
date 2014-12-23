@@ -140,7 +140,7 @@ void test_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_re
     Module *AND;
     ModuleAndPin *moduleAndPin;
     Pipe *pipe;
-    Node newNode;
+    Node *newNode;
     EventInfo *eventInfo, *result;
     int inputType = QUAD_2_INPUT;
 
@@ -149,8 +149,9 @@ void test_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_re
     pipe = createdPipeModule();
     pipe->stateToFire = HIGH;
     moduleAndPin = createdModuleAndPin(AND, AND->pin[0].pinNumber);
-    genericSetNode(&newNode, (void *)moduleAndPin, NULL, NULL, 'r');
-    pipe->data = &newNode;
+    newNode = createdNewPipeDataNode(moduleAndPin);
+    genericSetNode(newNode, (void *)moduleAndPin, NULL, NULL, 'r');
+    pipe->data = newNode;
     eventRoot = createdNewEventNode(NULL, pipe);
     eventInfo = (EventInfo *)eventRoot->dataPtr;
     eventInfo->time = ONE_NANO_SEC;
@@ -169,7 +170,7 @@ void test_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_re
     TEST_ASSERT_EQUAL(ONE_NANO_SEC + AND_PROPAGATION_DELAY, result->time);
 
     // destroyModuleAndPin(moduleAndPin);
-    // destroyPipeData(pipe);
+    destroyPipeData(pipe);
     destroyModule(AND);
     destroyEventNode(eventRoot);
 }
