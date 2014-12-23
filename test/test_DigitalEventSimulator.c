@@ -135,13 +135,13 @@ void test_eventSimulator_given_node_contain_AND_module_and_pin_should_return_0_a
     destroyEventNode(eventRoot);
 }
 
-void xtest_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_return_0_and_generate_event_for_pipe(void)
+void test_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_return_0_and_generate_event_for_pipe(void)
 {
     Module *AND;
-    ModuleAndPin *moduleAndPin, *result;
+    ModuleAndPin *moduleAndPin;
     Pipe *pipe;
     Node newNode;
-    EventInfo *eventInfo;
+    EventInfo *eventInfo, *result;
     int inputType = QUAD_2_INPUT;
 
     AND = createdAndModule(inputType);
@@ -159,12 +159,14 @@ void xtest_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_r
 
     TEST_ASSERT_EQUAL(0, eventSimulator());
 
-    result = (ModuleAndPin *)eventRoot->dataPtr;
+    result = (EventInfo *)eventRoot->dataPtr;
 
     TEST_ASSERT_NOT_NULL(eventRoot);
     TEST_ASSERT_NOT_NULL(result);
-    TEST_ASSERT_EQUAL_PTR(AND, result->module);
-    TEST_ASSERT_EQUAL_PTR(&AND->pin[0], result->pin);
+    TEST_ASSERT_NULL(result->pipe);
+    TEST_ASSERT_EQUAL_PTR(AND, result->moduleAndPin->module);
+    TEST_ASSERT_EQUAL_PTR(&AND->pin[0], result->moduleAndPin->pin);
+    TEST_ASSERT_EQUAL(ONE_NANO_SEC + AND_PROPAGATION_DELAY, result->time);
 
     // destroyModuleAndPin(moduleAndPin);
     destroyPipeData(pipe);

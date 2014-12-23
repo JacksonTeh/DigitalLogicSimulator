@@ -730,7 +730,6 @@ void pipeEvent(void *pipe, void *node, unsigned long long delay)
     if(data->left != NULL)
         pipeWithData->event((void *)pipeWithData, (void *)data->left, delay);
 
-
     if(data->right != NULL)
         pipeWithData->event((void *)pipeWithData, (void *)data->right, delay);
 
