@@ -169,7 +169,7 @@ void test_eventSimulator_given_node_contain_pipe_module_with_pipe_data_should_re
     // TEST_ASSERT_EQUAL(ONE_NANO_SEC + AND_PROPAGATION_DELAY, result->time);
 
     // destroyModuleAndPin(moduleAndPin);
-    destroyPipeData(pipe);
-    destroyModule(AND);
-    destroyEventNode(eventRoot);
+    // destroyPipeData(pipe);
+    // destroyModule(AND);
+    // destroyEventNode(eventRoot);
 }
