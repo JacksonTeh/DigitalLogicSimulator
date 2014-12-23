@@ -41,6 +41,7 @@ int eventSimulator()
     Node *removeNode;
 
     removeNode = findSmallestTimeEvent(&eventRoot);
+    assert(eventRoot == NULL);
 
     if(removeNode == NULL)
         return 1;
