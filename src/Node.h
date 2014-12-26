@@ -1,12 +1,8 @@
 #ifndef Node_H
 #define Node_H
 
-// #include "DigitalSignalModule.h"
-// #include "EventTime.h"
-
 typedef struct Node Node;
 
-// #include "EventTime.h"
 #include "DigitalSignalModule.h"
 
 struct Node

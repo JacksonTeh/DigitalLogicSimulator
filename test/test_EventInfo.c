@@ -1,6 +1,5 @@
 #include "unity.h"
 #include "EventInfo.h"
-// #include "DigitalEventSimulator.h"
 #include "InitNode.h"
 #include "RedBlackTree.h"
 #include "Rotations.h"

@@ -578,21 +578,6 @@ void test_createdNotModule_given_HEX_INV_type_should_create_module_for_NOT_gate(
     destroyModule(NOT);
 }
 
-// void test_storedModuleAndPin_should_store_module_and_pin(void)
-// {
-    // ModuleAndPin moduleAndPin;
-    // Module *AND;
-    // int inputType = DUAL_4_INPUT, andInPin = 1;
-
-    // AND = createdAndModule(inputType);
-    // storedModuleAndPin(&moduleAndPin, AND, andInPin);
-
-    // TEST_ASSERT_EQUAL_PTR(AND, moduleAndPin.module);
-    // TEST_ASSERT_EQUAL_PTR(&AND->pin[andInPin], moduleAndPin.pin);
-
-    // destroyModule(AND);
-// }
-
 void test_createdPipeModule_should_create_module_for_pipe(void)
 {
     Pipe *pipe;
@@ -694,8 +679,6 @@ void test_configureInputOutput_given_AND_and_OR_that_connected_to_pipe_should_co
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
     (OR->pin[9]).pipe = pipe;
-
-    // genericAddRedBlackTree_Expect(&((OR->pin[9]).pipe)->data, &newNode, compareModuleAndPin);
 
     OR->configure((void *)OR, (void *)&OR->pin[9], (void *)AND, (void *)&AND->pin[0]);
     moduleAndPin = (OR->pin[9]).pipe->data->dataPtr;
@@ -1361,7 +1344,7 @@ void test_setPipe_given_pipe_should_register_event_for_pipe(void)
 
     destroyPipeData(pipe);
 }
- 
+
 void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pipe_data(void)
 {
     Module *AND;
@@ -1373,10 +1356,8 @@ void test_pipeEvent_given_pipe_with_AND_module_data_should_register_event_for_pi
     AND = createdAndModule(inputType);
     pipe = createdPipeModule();
     pipe->stateToFire = HIGH;
-    // storedModuleAndPin(&pipeData, AND, (AND->pin[0]).pinNumber);
     pipeData = createdModuleAndPin(AND, (AND->pin[0]).pinNumber);
 
-    // genericSetNode(&newNode, (void *)pipeData, NULL, NULL, 'r');
     newNode = createdNewPipeDataNode(pipeData);
     pipe->data = newNode;
 
@@ -1402,13 +1383,9 @@ void test_pipeEvent_given_pipe_with_AND_and_OR_module_data_should_register_event
     OR = createdOrModule(inputType);
     pipe = createdPipeModule();
     pipe->stateToFire = HIGH;
-    // storedModuleAndPin(&andData, AND, (AND->pin[0]).pinNumber);
-    // storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
     andData = createdModuleAndPin(AND, (AND->pin[0]).pinNumber);
     orData = createdModuleAndPin(OR, (OR->pin[1]).pinNumber);
 
-    // genericSetNode(&orNode, (void *)orData, NULL, NULL, 'r');
-    // genericSetNode(&andRootNode, (void *)andData, &orNode, NULL, 'b');
     andRootNode = createdNewPipeDataNode(andData);
     orNode = createdNewPipeDataNode(orData);
     setNode(andRootNode, orNode, NULL, 'b');
@@ -1440,16 +1417,10 @@ void test_pipeEvent_given_pipe_with_3_module_data_should_register_event_for_all_
     OR = createdOrModule(inputType);
     pipe = createdPipeModule();
     pipe->stateToFire = HIGH;
-    // storedModuleAndPin(&andData1, AND1, (AND1->pin[0]).pinNumber);
     andData1 = createdModuleAndPin(AND1, (AND1->pin[0]).pinNumber);
-    // storedModuleAndPin(&andData2, AND2, (AND2->pin[0]).pinNumber);
     andData2 = createdModuleAndPin(AND2, (AND2->pin[0]).pinNumber);
-    // storedModuleAndPin(&orData, OR, (OR->pin[1]).pinNumber);
     orData = createdModuleAndPin(OR, (OR->pin[1]).pinNumber);
 
-    // genericSetNode(&orNode, (void *)orData, NULL, NULL, 'r');
-    // genericSetNode(&and2Node, (void *)andData2, NULL, NULL, 'r');
-    // genericSetNode(&and1RootNode, (void *)andData1, &orNode, &and2Node, 'b');
     and1RootNode = createdNewPipeDataNode(andData1);
     and2Node = createdNewPipeDataNode(andData2);
     orNode = createdNewPipeDataNode(orData);

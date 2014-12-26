@@ -1,8 +1,6 @@
 #ifndef DigitalSignalModule_H
 #define DigitalSignalModule_H
 
-// #include "Node.h"
-
 #define TOTAL_PIN       14
 #define ONE_PICO_SEC    1
 #define ONE_NANO_SEC    1000 * ONE_PICO_SEC
@@ -35,9 +33,8 @@ struct ModuleAndPin
 
 struct Pin
 {
-    // void *moduleConnected;    //module that is connected to
-    Pipe *pipe;
-    int pinNumber;              //pin of the module connected to
+    Pipe *pipe;             //pipe connected to
+    int pinNumber;          //pin of the module connected to
     int state;
     PinType type;
 };
@@ -68,7 +65,6 @@ void setPipe(void *pipe, int state, unsigned long long inputDelay);
 void destroyPipe(Pipe *pipe);
 void destroyPipeData(Pipe *pipe);
 
-// void storedModuleAndPin(ModuleAndPin *moduleAndPin, Module *module, int pinNum);
 ModuleAndPin *createdModuleAndPin(Module *module, int pinNum);
 void destroyModuleAndPin(ModuleAndPin *moduleAndPin);
 
@@ -105,8 +101,6 @@ void setNot(void *moduleAndPin, int state, unsigned long long delay);
 int funcOfNOT(Module *module, int pinNumber);
 
 void configureInputOutput(void *thisModule, void *fromPin, void *nextModule, void *toPin);
-
-// void pipeAttach(Pipe **pipe/*, Module **fromModule , void *fromPin*/, Module *toModule, void *toPin);
 
 int determineNumOfInputPin(int inputType);
 int determineNumOfOutputPin(int inputType);

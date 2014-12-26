@@ -10,32 +10,18 @@
 
 extern Node *eventRoot;
 
-// Node *registerEvent(ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
-// void registerEvent(Node **eventRoot, ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
 void registerEvent(ModuleAndPin *moduleAndPin, Pipe *pipe, unsigned long long expiredPeriod)
 {
     EventInfo *eventInfo;
     Node *newEventNode;
 
-    // eventInfo = createdEventInfo(moduleAndPin, pipe);
     newEventNode = createdNewEventNode(moduleAndPin, pipe);
     eventInfo = (EventInfo *)newEventNode->dataPtr;
     eventInfo->time = expiredPeriod;
 
     genericAddRedBlackTree(&eventRoot, newEventNode, compareEventInfo);
-
-    // assert(eventRoot != NULL);
-    // assert(root->dataPtr != NULL);
-    // return root;
 }
 
-// void storedEventInfoData(EventInfo *eventInfo, ModuleAndPin *moduleAndPin, Pipe *pipe)
-// {
-    // eventInfo->moduleAndPin = moduleAndPin;
-    // eventInfo->pipe = pipe;
-// }
-
-// int eventSimulator(Node *eventRoot)
 int eventSimulator()
 {
     Node *removeNode;
